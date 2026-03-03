@@ -58,7 +58,7 @@ public:
     int idk8[2];                                 // <0x580>
     AnmLoaded* someAnmLoaded;                    // <0x588>
     int idk9;                                    // <0x58c>
-    uint32_t criticalSectionFlag;                // <0x590>
+    uint32_t flags;                              // <0x590>
     DWORD currentTime;                           // <0x594>
     uint32_t idk10[78];                          // <0x598>
     uint32_t snapshotFlag;                       // <0x6d0>
@@ -103,6 +103,8 @@ public:
     static void releaseChains();
     static HRESULT disableD3dFog(Supervisor* This);
     static void cleanup(Supervisor* This);
+    static int readKeyInput();
+    static int updateJoystickState(int keyboardInput);
 };
 #pragma pack(pop)
 ASSERT_SIZE(Supervisor, 0x9c4);

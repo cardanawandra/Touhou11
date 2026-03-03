@@ -7,6 +7,8 @@
 #include "Rng.h"
 #include "Supervisor.h"
 #include "SoundManager.h"
+#include "GameConfig.h"
+#include "InputManager.h"
 
 class AnmManager;
 class Supervisor;
@@ -49,39 +51,17 @@ struct Globals
 };
 ASSERT_SIZE(Globals, 0x78);
 
-// These link directly to the labels defined in symbols.asm
-extern "C"
-{
-    extern RenderVertex144 g_renderQuad144[4];
-    extern Supervisor g_supervisor;
-    extern AnmManager* g_anmManager;
-    extern Chain* g_chain;
-    extern Window g_window;
-    extern PbgArchive g_pbgArchive;
-    extern PbgArchive* g_pbgArchives;
-    extern int g_numEntriesInDatFile;
-    extern LzssTreeNode g_lzssTree[0x2001];
-    extern byte g_lzssDict[0x2000];
-    extern Spellcard* g_spellcard;
-    extern FpsCounter* g_fpsCounter;
-    extern RenderVertexSq g_squareVertices[4];
-    extern float g_gameSpeed;
-    extern Globals g_globals;
-    extern Player* g_player;
-    extern SoundManager g_soundManager;
-    extern SoundConfig g_soundConfigTable[56];
-    extern RngContext g_anmRngContext;
-    extern RngContext g_replayRngContext;
-    extern HANDLE g_app;
-    extern HGDIOBJ g_gdiObject_0;
-    extern HGDIOBJ g_gdiObject_1;
-    extern HGDIOBJ g_gdiObject_2;
-    extern HGDIOBJ g_gdiObject_3;
+#define X_VAR(type, name, addr) \
+    using __Type_##name = type; \
+    inline __Type_##name& name = *reinterpret_cast<__Type_##name*>(addr);
 
-    void __cdecl game_free(void* memory);
-    void* __cdecl game_malloc(size_t size);
-    void* __cdecl game_new(size_t size);
-}
+#define X_FUNC(ret, name, addr, params) \
+    inline auto& name = *reinterpret_cast<ret (*) params>(addr);
+
+#include "symbols.inc"
+
+#undef X_VAR
+#undef X_FUNC
 
 extern D3DFORMAT g_d3dFormats[];
 extern uint32_t g_bytesPerPixelLookupTable[];

@@ -1,11 +1,9 @@
 #include "GameConfig.h"
-
-#if 1
-GameConfig g_defaultGameConfig;
+#include "Globals.h"
 
 GameConfig::GameConfig()
 {
-	// memset(this, 0,  sizeof(GameConfig));
+	memset(this, 0,  sizeof(GameConfig));
 	flags |= 0x100;
 	padDeadzoneX  = 600;
 	colorDepth    = 0;
@@ -23,7 +21,7 @@ GameConfig::GameConfig()
 	downKey       = g_defaultGameConfig.downKey;
 	leftKey       = g_defaultGameConfig.leftKey;
 	rightKey      = g_defaultGameConfig.rightKey;
-	refreshRate   = g_defaultGameConfig.refreshRate;
+	skipKey       = g_defaultGameConfig.skipKey;
 	musicMode     = 2;
 	latencyMode   = 2;
 	isWindowed    = 0;
@@ -32,4 +30,3 @@ GameConfig::GameConfig()
 	windowPosX    = 0x80000000;
 	windowPosY    = 0x80000000;
 }
-#endif

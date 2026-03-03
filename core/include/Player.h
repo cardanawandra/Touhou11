@@ -140,7 +140,7 @@ public:
     AnmId anmIdFocusedHitbox;                              // <0x7500>
     PlayerOption playerOptions[8];                         // <0x7504>
     int idk6[30];                                          // <0x7c24>
-    PlayerDamageSource damageSouces[33];                   // <0x7c9c>
+    PlayerDamageSource damageSources[33];                  // <0x7c9c>
     int shooterOptions[4];                                 // <0x8b90>
     int percentageMovedByOptions;                          // <0x8ba0>
     int reimuB_FramesWithoutInput;                         // <0x8ba4>

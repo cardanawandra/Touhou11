@@ -1,4 +1,4 @@
-﻿#include "Supervisor.h"
+#include "Supervisor.h"
 #include "AnmManager.h"
 #include "AnmLoaded.h"
 #include "Chain.h"
@@ -6,6 +6,7 @@
 #include "Window.h"
 #include "GameConfig.h"
 #include "DebugGui.h"
+#include "InputManager.h"
 #include <bit>
 
 void Supervisor::releaseDinputIface()
@@ -24,7 +25,7 @@ void Supervisor::enterCriticalSection(size_t criticalSectionNumber)
     if (criticalSectionNumber >= 12)
         return;
 
-    if ((criticalSectionFlag & 0x8000) != 0)
+    if ((flags & 0x8000) != 0)
     {
         EnterCriticalSection(&criticalSections[criticalSectionNumber]);
         ++criticalSectionCounters[criticalSectionNumber];
@@ -36,7 +37,7 @@ void Supervisor::leaveCriticalSection(size_t criticalSectionNumber)
     if (criticalSectionNumber >= 12)
         return;
 
-    if ((criticalSectionFlag & 0x8000) != 0)
+    if ((flags & 0x8000) != 0)
     {
         LeaveCriticalSection(&criticalSections[criticalSectionNumber]);
         --criticalSectionCounters[criticalSectionNumber];
@@ -88,7 +89,7 @@ int Supervisor::verifyGameConfig()
         g_defaultGameConfig.downKey = m_gameConfig.downKey;
         g_defaultGameConfig.leftKey = m_gameConfig.leftKey;
         g_defaultGameConfig.rightKey = m_gameConfig.rightKey;
-        g_defaultGameConfig.refreshRate = m_gameConfig.refreshRate;
+        g_defaultGameConfig.skipKey = m_gameConfig.skipKey;
     }
 
     uint32_t flags = m_gameConfig.flags;
@@ -480,7 +481,7 @@ int Supervisor::initD3d9Devices(D3DFORMAT d3dFormat)
     printf("Attempting VSync async possible check of D3D Device at %p\n", g_supervisor.d3dDevice);
 
 SETUP_PRESENT_PARAMS:
-    g_supervisor.criticalSectionFlag |= 2;
+    g_supervisor.flags |= 2;
     memset(&d3dpp, 0, sizeof(D3DPRESENT_PARAMETERS));
 
     d3dpp.BackBufferWidth = 640;
@@ -520,7 +521,7 @@ SETUP_PRESENT_PARAMS:
                 InitDebugWindow(g_supervisor.d3dDevice);  //ImGuiHook::getInstance().hook(g_supervisor.d3dDevice);
                 printf("ImGui Hook Attached.\n");
 #endif
-                g_supervisor.criticalSectionFlag |= 1;
+                g_supervisor.flags |= 1;
                 goto DEVICE_CREATED;
             }
 
@@ -544,7 +545,7 @@ SETUP_PRESENT_PARAMS:
                 InitDebugWindow(g_supervisor.d3dDevice); //ImGuiHook::getInstance().hook(g_supervisor.d3dDevice);
                 printf("ImGui Hook Attached.\n");
 #endif
-                g_supervisor.criticalSectionFlag &= ~1;
+                g_supervisor.flags &= ~1;
                 goto DEVICE_CREATED;
             }
 
@@ -594,7 +595,7 @@ SETUP_PRESENT_PARAMS:
     InitDebugWindow(g_supervisor.d3dDevice);
     printf("ImGui Hook Attached.\n");
 #endif
-    g_supervisor.criticalSectionFlag &= ~1;
+    g_supervisor.flags &= ~1;
 
 DEVICE_CREATED:
     
@@ -643,10 +644,10 @@ DEVICE_CREATED:
         );
 
         if (hr == D3D_OK)
-            g_supervisor.criticalSectionFlag |= 4;
+            g_supervisor.flags |= 4;
         else
         {
-            g_supervisor.criticalSectionFlag &= ~4;
+            g_supervisor.flags &= ~4;
             g_supervisor.m_gameConfig.flags |= 1;
             printf("D3DFMT_A8R8G8B8 not supported on D3D Device at %p, running in reduced color mode\n", g_supervisor.d3dDevice);
         }
@@ -776,6 +777,176 @@ HRESULT Supervisor::disableD3dFog(Supervisor* This)
         return This->d3dDevice->SetRenderState(D3DRS_FOGENABLE, 0);
     }
     return 0;
+}
+
+// 0x4576b0
+int Supervisor::readKeyInput()
+{
+    if (!g_window.isAppFocused)
+        return 0;
+
+    BYTE keyState[256]{};
+    bool useDirectInput = (g_supervisor.m_gameConfig.flags & 0x400);
+
+    if (useDirectInput)
+    {
+        HRESULT hr = g_supervisor.keyboard->GetDeviceState(sizeof(keyState), keyState);
+
+        if (hr == DIERR_INPUTLOST || hr == DIERR_NOTACQUIRED)
+        {
+            g_supervisor.keyboard->Acquire();
+            return g_inputManager.currentState;
+        }
+    }
+    else
+        GetKeyboardState(keyState);
+
+    int inputs = 0;
+
+    auto isDown = [&](int dik, int vk) -> bool
+    {
+        int key = useDirectInput ? dik : vk;
+        return (keyState[key] & 0x80) != 0;
+    };
+
+    if (isDown(DIK_Z, 'Z'))               inputs |= InputBits::SHOOT;
+    if (isDown(DIK_X, 'X'))               inputs |= InputBits::BOMB;
+    if (isDown(DIK_LSHIFT, VK_SHIFT))     inputs |= InputBits::FOCUS;
+
+    // Directionals (Arrow Keys)
+    if (isDown(DIK_UP, VK_UP))            inputs |= InputBits::UP;
+    if (isDown(DIK_DOWN, VK_DOWN))        inputs |= InputBits::DOWN;
+    if (isDown(DIK_LEFT, VK_LEFT))        inputs |= InputBits::LEFT;
+    if (isDown(DIK_RIGHT, VK_RIGHT))      inputs |= InputBits::RIGHT;
+
+    // Numpad Directionals
+    if (isDown(DIK_NUMPAD8, VK_NUMPAD8))  inputs |= InputBits::UP;
+    if (isDown(DIK_NUMPAD2, VK_NUMPAD2))  inputs |= InputBits::DOWN;
+    if (isDown(DIK_NUMPAD4, VK_NUMPAD4))  inputs |= InputBits::LEFT;
+    if (isDown(DIK_NUMPAD6, VK_NUMPAD6))  inputs |= InputBits::RIGHT;
+
+    // High Bits
+    if (isDown(DIK_ESCAPE, VK_ESCAPE))    inputs |= InputBits::ESC;
+    if (isDown(DIK_LCONTROL, VK_CONTROL)) inputs |= InputBits::SKIP;
+    if (isDown(DIK_Q, 'Q'))               inputs |= InputBits::Q;
+    if (isDown(DIK_S, 'S'))               inputs |= InputBits::S;
+
+    // P and Home map to the same bit (Bit 12)
+    if (isDown(DIK_P, 'P') || isDown(DIK_HOME, VK_HOME)) inputs |= InputBits::HOME_P;
+
+    if (isDown(DIK_RETURN, VK_RETURN))    inputs |= InputBits::ENTER;
+    if (isDown(DIK_D, 'D'))               inputs |= InputBits::D;
+    if (isDown(DIK_R, 'R'))               inputs |= InputBits::R;
+    if (isDown(DIK_F10, VK_F10))          inputs |= InputBits::F10;
+
+    if (isDown(DIK_NUMPAD7, VK_NUMPAD7))  inputs |= (InputBits::DOWN | InputBits::LEFT);  // 0x60
+    if (isDown(DIK_NUMPAD9, VK_NUMPAD9))  inputs |= (InputBits::DOWN | InputBits::RIGHT); // 0xA0
+    if (isDown(DIK_NUMPAD1, VK_NUMPAD1))  inputs |= (InputBits::UP | InputBits::RIGHT);   // 0x90
+    if (isDown(DIK_NUMPAD3, VK_NUMPAD3))  inputs |= (InputBits::UP | InputBits::LEFT);    // 0x50
+
+    int finalInputState = updateJoystickState(inputs);
+
+    // Update global input history
+    g_inputManager.previousState = g_inputManager.currentState;
+    g_inputManager.currentState = finalInputState;
+    g_inputManager.update(&g_inputManager);
+    return finalInputState;
+}
+
+int Supervisor::updateJoystickState(int keyboardInput)
+{
+    int inputState = keyboardInput;
+
+    // Check if we should use the Win32 Multimedia API
+    if (g_supervisor.m_gameConfig.flags & 0x800)
+    {
+        JOYINFOEX joyInfo;
+        memset(&joyInfo, 0, sizeof(joyInfo));
+        joyInfo.dwSize = sizeof(joyInfo);
+        joyInfo.dwFlags = JOY_RETURNALL;
+
+        if (joyGetPosEx(JOYSTICKID1, &joyInfo) != JOYERR_NOERROR)
+            return inputState;
+
+        if (g_defaultGameConfig.shootKey >= 0 && (joyInfo.dwButtons & (1 << g_defaultGameConfig.shootKey)))
+            inputState |= InputBits::SHOOT;
+
+        if (g_defaultGameConfig.bombKey >= 0 && (joyInfo.dwButtons & (1 << g_defaultGameConfig.bombKey)))
+            inputState |= InputBits::BOMB;
+
+        if (g_defaultGameConfig.pauseKey >= 0 && (joyInfo.dwButtons & (1 << g_defaultGameConfig.pauseKey)))
+            inputState |= InputBits::PAUSE;
+
+        if (g_defaultGameConfig.focusKey >= 0 && (joyInfo.dwButtons & (1 << g_defaultGameConfig.focusKey)))
+            inputState |= InputBits::FOCUS;
+
+        if (g_defaultGameConfig.skipKey >= 0 && (joyInfo.dwButtons & (1 << g_defaultGameConfig.skipKey)))
+            inputState |= InputBits::SKIP;
+
+        int xRange = g_joyAxisX_Max - g_joyAxisX_Min;
+        int xCenter = g_joyAxisX_Min + (xRange / 2);
+        int xVal = (int)joyInfo.dwXpos - xCenter;
+        int xThreshold = xRange / 4;
+
+        if (xVal < -xThreshold) inputState |= InputBits::LEFT;
+        if (xVal > xThreshold)  inputState |= InputBits::RIGHT;
+
+        int yRange = g_joyAxisY_Max - g_joyAxisY_Min;
+        int yCenter = g_joyAxisY_Min + (yRange / 2);
+        int yVal = (int)joyInfo.dwYpos - yCenter;
+        int yThreshold = yRange / 4;
+
+        if (yVal < -yThreshold) inputState |= InputBits::UP;    // 0x10
+        if (yVal > yThreshold)  inputState |= InputBits::DOWN;  // 0x20
+
+    }
+    else
+    {
+        HRESULT hr = g_supervisor.joystick->Poll();
+        if (FAILED(hr))
+        {
+            hr = g_supervisor.joystick->Acquire();
+            while (hr == DIERR_INPUTLOST)
+            {
+                hr = g_supervisor.joystick->Acquire();
+                static int retryCount = 0;
+                if (++retryCount >= 400)
+                    break;
+            }
+            if (FAILED(hr))
+                return inputState;
+        }
+
+        // Get State
+        DIJOYSTATE2 js;
+        memset(&js, 0, sizeof(js));
+        hr = g_supervisor.joystick->GetDeviceState(sizeof(DIJOYSTATE2), &js);
+        if (FAILED(hr))
+            return inputState;
+
+        auto isBtnDown = [&](int16_t keyIndex)
+        {
+            if (keyIndex < 0) 
+                return false;
+            return (js.rgbButtons[keyIndex] & 0x80) != 0;
+        };
+
+        if (isBtnDown(g_defaultGameConfig.shootKey)) inputState |= InputBits::SHOOT;
+        if (isBtnDown(g_defaultGameConfig.bombKey))  inputState |= InputBits::BOMB;
+        if (isBtnDown(g_defaultGameConfig.pauseKey)) inputState |= InputBits::PAUSE;
+        if (isBtnDown(g_defaultGameConfig.focusKey)) inputState |= InputBits::FOCUS;
+        if (isBtnDown(g_defaultGameConfig.skipKey)) inputState |= InputBits::SKIP;
+
+        int deadX = g_supervisor.m_gameConfig.padDeadzoneX;
+        int deadY = g_supervisor.m_gameConfig.padDeadzoneY;
+
+        if (js.lX < -deadX) inputState |= InputBits::LEFT;
+        if (js.lX > deadX)  inputState |= InputBits::RIGHT;
+        if (js.lY < -deadY) inputState |= InputBits::UP;
+        if (js.lY > deadY)  inputState |= InputBits::DOWN;
+    }
+
+    return inputState;
 }
 
 void Supervisor::cleanup(Supervisor* This)

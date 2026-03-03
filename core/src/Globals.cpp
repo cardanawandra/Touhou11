@@ -1,8 +1,4 @@
-﻿#include "Globals.h"
-#include "AnmManager.h"
-#include "Supervisor.h"
-#include "AsciiManager.h"
-#include "Chain.h"
+#include "Globals.h"
 #include "FileAbstraction.h"
 
 D3DFORMAT g_d3dFormats[] = { D3DFMT_UNKNOWN, D3DFMT_A8R8G8B8, D3DFMT_A1R5G5B5, D3DFMT_R5G6B5, D3DFMT_R8G8B8, D3DFMT_A4R4G4B4 };

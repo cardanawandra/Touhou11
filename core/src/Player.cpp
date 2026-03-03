@@ -161,6 +161,32 @@ PostVmLogic:
     return 0;
 }
 
+PlayerDamageSource* Player::createDamageSource(Player* This, D3DXVECTOR3* v, float argF0, float argF1, int currentTime, int argi1)
+{
+    PlayerDamageSource* ds = This->damageSources;
+    for (int i = 0; i < 32; ++i)
+    {
+        if ((ds->flags & 1) == 0)
+        {
+            memset(ds, 0, 0x74);
+            ds->flags = ds->flags | 3;
+            memset(&ds->centerPosition, 0, 0x34); // Okay, there's some more stuff here than just one d3dxvector3... what struct is this?
+            ds->centerPosition.x = v->x;
+            ds->centerPosition.y = v->y;
+            ds->centerPosition.z = v->z;
+            ds->argf0 = argF0;
+            ds->argf1 = argF1;
+            ds->timer.set(&ds->timer, currentTime);
+            ds->argi1 = argi1;
+            ds->someInt = 0;
+            ds->someInt999999 = 999999;
+            ds->someInt6c = 4;
+            return ds;
+        }
+    }
+    return ds;
+}
+
 #if 0
 int Player::move(Player* This)
 {

@@ -1669,15 +1669,15 @@ void AnmVm::run(AnmVm* This)
             posY = std::bit_cast<float>(This->m_currentInstruction->args[1]);
             posZ = std::bit_cast<float>(This->m_currentInstruction->args[2]);
 
-            if ((This, This->m_flagsLow & 0x100) == 0)
+            if ((This->m_flagsLow & 0x100) == 0)
             {
-                if ((This, This->m_currentInstruction->varMask & 4) != 0)
+                if ((This->m_currentInstruction->varMask & 4) != 0)
                     posZ = getFloatVar(This, posZ);
 
-                if ((This, This->m_currentInstruction->varMask & 2) != 0)
+                if ((This->m_currentInstruction->varMask & 2) != 0)
                     posY = getFloatVar(This, posY);
 
-                if ((This, This->m_currentInstruction->varMask & 1) != 0)
+                if ((This->m_currentInstruction->varMask & 1) != 0)
                     posX = getFloatVar(This, posX);
 
                 This->m_pos.x = posX;
@@ -1889,17 +1889,26 @@ void AnmVm::run(AnmVm* This)
             // 2: Subtract (SRCALPHA, ONE, REVSUBTRACT)
             // ...
         case 66: // blendMode(int mode)
-
+        {
+            uint32_t uVar2 = (This->m_currentInstruction->args[0] << 4 ^ This->m_flagsLow) & 0x70;
+            This->m_flagsLow ^= uVar2;
             break;
-
+        }
             // Determines how the ANM is rendered.
             // Mode 0: 2D sprites, no rotation.
             // Mode 1: 2D sprites with z-axis rotation.
             // Mode 8: 3D rotation.
             // Mode 2: Like mode 0 but shifted by (-0.5, -0.5) pixels.
         case 67: // type(int mode)
-
+        {
+            This->m_flagsLow = This->m_flagsLow ^ (This->m_currentInstruction->args[0] << 0x16 ^ This->m_flagsLow) & 0x3c00000;
+            if ((This->m_flagsLow & 0x3c00000) == 0x2800000)
+            {
+              // linkChains(This);
+              This->loadNextInstruction();
+            }
             break;
+        }
 
             // Sets the layer of the ANM. This may or may not affect z-ordering? It's weird...
             // Different layer numbers may behave differently! Each game only has a finite number of layers, and certain groups of these layers are drawn at different stages in the rendering pipeline.
@@ -1923,7 +1932,7 @@ void AnmVm::run(AnmVm* This)
                 instr_interrupt = nullptr;
                 while (1)
                 {
-                    uint16_t m_currentInstruction_opcode = This->m_currentInstruction->opcode;
+                    int16_t m_currentInstruction_opcode = This->m_currentInstruction->opcode;
                     opcode = 0; // Nop
 
                     if ((m_currentInstruction_opcode == 64 && This->m_pendingInterrupt == This->m_currentInstruction->args[0]) || m_currentInstruction_opcode == -1)

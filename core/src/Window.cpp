@@ -23,7 +23,7 @@ LRESULT Window::wndProcCallback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lpPa
         break;
 
     case WM_CLOSE:
-        g_supervisor.criticalSectionFlag = (g_supervisor.criticalSectionFlag & ~0x100) | 0x80;
+        g_supervisor.flags = (g_supervisor.flags & ~0x100) | 0x80;
         return 1;
 
     case WM_ERASEBKGND:

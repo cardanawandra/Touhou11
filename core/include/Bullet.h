@@ -160,9 +160,9 @@ public:
     BulletExState04_Turn exTurn;
     BulletExState08_Bounce exBounce;
     BulletExState12_Wait exWait;
-    BulletExState17 ex17;
-    BulletExState18 ex18;
-    BulletExState23 ex23;
+    BulletExState17 ex17; // Usused
+    BulletExState18 ex18; // Usused
+    BulletExState23 ex23; // Usused
     BulletExState25_Move exMove;
     BulletExState27_VelAdditional exVelAdditional;
     uint32_t idk5;

@@ -3,36 +3,36 @@
 #include "Globals.h"
 #include "ThunkGenerator.h"
 
-AnmManager::AnmManager()
+AnmManager* AnmManager::initialize(AnmManager* This)
 {
-    memset(this, 0, sizeof(AnmManager));
+    memset(This, 0, sizeof(AnmManager));
 
-    this->m_primaryVm = AnmVm();
+    This->m_primaryVm = AnmVm();
     for (int i = 0; i < 4096; ++i)
-        m_fastVms[i].initialize(&m_fastVms[i]);
+        This->m_fastVms[i].initialize(&This->m_fastVms[i]);
 
     g_renderQuad144[0].uv.x = 0.0f; g_renderQuad144[0].uv.y = 0.0f; g_renderQuad144[0].rhw = 1.0f;
     g_renderQuad144[1].uv.x = 1.0f; g_renderQuad144[1].uv.y = 0.0f; g_renderQuad144[1].rhw = 1.0f;
     g_renderQuad144[2].uv.x = 0.0f; g_renderQuad144[2].uv.y = 1.0f; g_renderQuad144[2].rhw = 1.0f;
     g_renderQuad144[3].uv.x = 1.0f; g_renderQuad144[3].uv.y = 1.0f; g_renderQuad144[3].rhw = 1.0f;
 
-    this->m_squareVertexBuffer = nullptr;
-    this->m_anmLoadedD3D = nullptr;
-    this->m_renderStateMode = 0;
-    this->m_unk_4355c1 = 0;
-    this->m_unk_4355c3 = 0;
-    this->m_unk_4355c4 = -1;
-    this->m_color = 1;
-    this->m_haveFlushedSprites = 0;
+    This->m_squareVertexBuffer = nullptr;
+    This->m_anmLoadedD3D = nullptr;
+    This->m_renderStateMode = 0;
+    This->m_unk_4355c1 = 0;
+    This->m_unk_4355c3 = 0;
+    This->m_unk_4355c4 = -1;
+    This->m_color = 1;
+    This->m_haveFlushedSprites = 0;
 
     for (int i = 0; i < 4; i++)
-        this->m_blitParamsArray[i].anmLoadedIndex = -1;
+        This->m_blitParamsArray[i].anmLoadedIndex = -1;
 
     auto addChain = [&](int priority, ChainCallback callback, bool isCalcChain) -> void {
         ChainElem* elem = (ChainElem*)game_new(sizeof(ChainElem));
         elem->nextNode = (ChainElem*)((uintptr_t)elem->nextNode | 3);
         elem->jobRunDrawChainCallback = callback;
-        elem->args = this;
+        elem->args = This;
         elem->registerChainCallback = nullptr;
         elem->runCalcChainCallback = nullptr;
 
@@ -71,6 +71,7 @@ AnmManager::AnmManager()
     addChain(0x30, on_draw_30_also_renders_layer_20, false);
     addChain(0x3f, on_draw_3f_also_renders_layer_29, false);
     addChain(0x3e, on_draw_3e_also_renders_layer_30, false);
+    return This;
 }
 
 AnmManager::~AnmManager()
@@ -174,7 +175,7 @@ AnmLoaded* AnmManager::preloadAnm(int anmSlotIndex, const char* anmFileName)
         return nullptr;
 
     anmLoaded->m_anmsLoading = 1;
-    while (anmLoaded->m_anmsLoading != 0 && (g_supervisor.criticalSectionFlag & 0x180) == 0) // Wait until animation loading is complete
+    while (anmLoaded->m_anmsLoading != 0 && (g_supervisor.flags & 0x180) == 0) // Wait until animation loading is complete
         Sleep(1);
 
     printf("preloadAnm: %s\n", anmFileName);
@@ -1513,8 +1514,8 @@ void AnmManager::drawVm(AnmManager* This, AnmVm* vm)
     if ((vm->m_flagsLow & 0x3) != 0x3 || alpha == 0)
         return;
     uint32_t mode = vm->m_flagsLow >> 0x16 & 0xf;
-    if (mode == 4)
-        printf("drawing vm with mode %d\n", mode);
+    // if (mode == 4)
+    //     printf("drawing vm with mode %d\n", mode);
 
     switch (mode)
     {
@@ -1561,7 +1562,7 @@ void AnmManager::drawVm(AnmManager* This, AnmVm* vm)
     case 4:
     {
         vm->projectQuadCornersThroughCameraViewport(vm);
-        drawVmSprite2D(This, 0, vm);
+        // drawVmSprite2D(This, 0, vm);
         break;
     }
     case 5:

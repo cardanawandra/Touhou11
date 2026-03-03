@@ -4,15 +4,15 @@
 struct GameConfig
 {
     uint32_t version;          // <0x00> always 0x110003 for a valid file
-    uint16_t shootKey;         // <0x04> shot (Z)
-    uint16_t bombKey;          // <0x06> bomb (X)
-    uint16_t focusKey;         // <0x08> focus / slow (Shift)
-    uint16_t pauseKey;         // <0x0A> pause / menu (Esc)
-    uint16_t upKey;            // <0x0C> up (Up-Arrow)
-    uint16_t downKey;          // <0x0E> down (Down-Arrow)
-    uint16_t leftKey;          // <0x10> left (Left-Arrow)
-    uint16_t rightKey;         // <0x12> right (Right-Arrow)
-    uint16_t refreshRate;      // <0x14> monitor refresh rate (forced to 60)
+    int16_t shootKey;          // <0x04> shot (Z)
+    int16_t bombKey;           // <0x06> bomb (X)
+    int16_t focusKey;          // <0x08> focus / slow (Shift)
+    int16_t pauseKey;          // <0x0A> pause / menu (Esc)
+    int16_t upKey;             // <0x0C> up (Up-Arrow)
+    int16_t downKey;           // <0x0E> down (Down-Arrow)
+    int16_t leftKey;           // <0x10> left (Left-Arrow)
+    int16_t rightKey;          // <0x12> right (Right-Arrow)
+    int16_t skipKey;           // <0x14> skip key or refresh rate?
     uint16_t padDeadzoneX;     // <0x16> pad X dead-zone / sensitivity (0-1000, default 600)
     uint16_t padDeadzoneY;     // <0x18> pad Y dead-zone / sensitivity (same as X)
     uint8_t  colorDepth;       // <0x1A> 0 = 32-bit (recommended), 1 = 16-bit
@@ -57,4 +57,4 @@ struct GameConfig
     GameConfig();
 };
 ASSERT_SIZE(GameConfig, 0x3C);
-extern GameConfig g_defaultGameConfig;
+

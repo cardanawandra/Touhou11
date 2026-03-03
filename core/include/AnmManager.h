@@ -205,6 +205,8 @@ public:
      */
     static AnmVm* allocateVm();
 
+    static AnmManager* initialize(AnmManager* This);
+
     static AnmVm* getVmWithId(AnmManager* This, int anmId);
     static void blitTextures(AnmManager* This);
 

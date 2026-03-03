@@ -6,14 +6,16 @@
 #include <vector>
 #include <utility>
 
-inline void installHook(DWORD targetAddress, void* hookFunction)
+template<typename F>
+inline void installHook(DWORD addr, F hookFunc)
 {
-    DWORD relativeJump = (DWORD)hookFunction - targetAddress - 5;
+    void* funcAddr = reinterpret_cast<void*>(hookFunc);
+    DWORD relativeJump = (DWORD)funcAddr - addr - 5;
     DWORD oldProtect;
-    VirtualProtect((void*)targetAddress, 5, PAGE_EXECUTE_READWRITE, &oldProtect);
-    *(BYTE*)targetAddress = 0xE9; // JMP opcode
-    *(DWORD*)(targetAddress + 1) = relativeJump;
-    VirtualProtect((void*)targetAddress, 5, oldProtect, &oldProtect);
+    VirtualProtect((void*)addr, 5, PAGE_EXECUTE_READWRITE, &oldProtect);
+    *(BYTE*)addr = 0xE9; // JMP opcode
+    *(DWORD*)(addr + 1) = relativeJump;
+    VirtualProtect((void*)addr, 5, oldProtect, &oldProtect);
 }
 
 // Represents a value located on the stack at [EBP + Offset]
@@ -260,9 +262,10 @@ void ProcessArgsReverse(CodeEmitter& e)
         e.pushStack(T::offset + 4); // +4 to account for for ebp push
 }
 
-template <typename... Args>
-void* createLtoThunk(void* targetFunction, int retPopSize)
+template <typename... Args, typename F>
+void* createLtoThunk(F targetFunc, int retN)
 {
+    void* targetPtr = reinterpret_cast<void*>(targetFunc);
     CodeEmitter e;
 
     // Prologue
@@ -276,7 +279,7 @@ void* createLtoThunk(void* targetFunction, int retPopSize)
 
     // Call Target
     e.addByte(0xB8);
-    e.addDword((uint32_t)targetFunction);
+    e.addDword((uint32_t)targetPtr);
     e.addWord(0xD0FF); // call eax
 
     // Cleanup Hook Arguments
@@ -306,10 +309,10 @@ void* createLtoThunk(void* targetFunction, int retPopSize)
     e.addByte(0x5D); // pop ebp
 
     // ret n
-    if (retPopSize > 0)
+    if (retN > 0)
     {
         e.addByte(0xC2);
-        e.addWord((uint16_t)retPopSize);
+        e.addWord((uint16_t)retN);
     }
     // ret
     else

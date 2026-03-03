@@ -132,10 +132,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpvReserved)
 {
     if (fdwReason == DLL_PROCESS_ATTACH)
     {
-        setupConsole();
+        // setupConsole();
 
         installHook(0x4540f0, createLtoThunk<ESI>(AnmLoadedD3D::createTextureFromAtR, 0));
-
 
         //installHook(0x455a70, createLtoThunk<Stack<0x4>, Stack<0x8>, Stack<0xc>, Stack<0x10>, EAX>(AsciiManager::spawnAnm, 0x10));
         // 
@@ -198,7 +197,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpvReserved)
         installHook(0x459270, createLtoThunk<Returns<RegCode::EAX>, ESI>(Timer::increment, 0));
 
         installHook(0x446ae0, createLtoThunk<Returns<RegCode::EAX>, EBX>(Window::initialize, 0));
-        installHook(0x4461f0, createLtoThunk<ESI>(Window::update, 0));
+        // installHook(0x4461f0, createLtoThunk<ESI>(Window::update, 0));
 
         // Globals
         installHook(0x458400, createLtoThunk<Returns<RegCode::EAX>, EAX, Stack<0x4>, Stack<0x8>>(openFile, 0x8));
@@ -212,7 +211,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpvReserved)
         installHook(0x429ca0, snapshot);
         installHook(0x458a10, createLtoThunk<Stack<0x4>>(logThunk, 0));
         installHook(0x458af0, createLtoThunk<Stack<0x4>>(logThunk, 0));
-
         //waitForDebugger();
     }
     return TRUE;

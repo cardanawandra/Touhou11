@@ -27,8 +27,8 @@ struct SpecialRenderData
 
 struct AnmRawInstruction
 {
-    uint16_t opcode;
-    uint16_t offsetToNextInstr;
+    int16_t opcode;
+    int16_t offsetToNextInstr;
     short time;
     uint16_t varMask;
     int args[10];

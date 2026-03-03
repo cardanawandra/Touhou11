@@ -10,6 +10,7 @@
 #include "FileAbstraction.h"
 #include "ScoreManager.h"
 #include "SoundManager.h"
+#include <winbase.h>
 
 void resolveLnkShortcut(LPCSTR shortcutPath, LPSTR targetPath)
 {
@@ -88,7 +89,7 @@ int getLaunchInfo()
     GetStartupInfoA(&startupInfo);
 
     if (startupInfo.lpTitle == nullptr)
-        g_supervisor.criticalSectionFlag |= 0x40;
+        g_supervisor.flags |= 0x40;
     else
     {
         fileExtensionString = strrchr(startupInfo.lpTitle, '.');
@@ -107,7 +108,7 @@ int getLaunchInfo()
             if (strcmp(resolvedPath, moduleFilename) != 0)
                 g_window.unusualLaunchFlag = 1;
         }
-        g_supervisor.criticalSectionFlag &= ~0x40;
+        g_supervisor.flags &= ~0x40;
     }
     return (g_app != nullptr) ? 0 : -1;
 }
@@ -197,9 +198,9 @@ BOOL CALLBACK chooseResolutionDialog(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM
 }
 
 // 0x445510
-#if 0
-int APIENTRY main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
+    #if 0
     int launchInfo;
     int initStatus;
     int result3;
@@ -244,7 +245,7 @@ int APIENTRY main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
 
     timeBeginPeriod(1);
 
-    g_supervisor.criticalSectionFlag = g_supervisor.criticalSectionFlag | 0x8000;
+    g_supervisor.flags |= 0x8000;
     for (int i = 0; i < 12; ++i)
         InitializeCriticalSection(&g_supervisor.criticalSections[i]);
 
@@ -276,11 +277,9 @@ int APIENTRY main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
                 }
                 if ((g_window.someFlag2 & 0x60) == 0)
                 {
-                    g_window.someFlag2 =
-                        g_window.someFlag2 ^
-                        ((uint)g_supervisor.m_gameConfig.displayMode * 4 ^ g_window.someFlag2) & 0xc;
+                    g_window.someFlag2 ^= ((uint32_t)g_supervisor.m_gameConfig.displayMode * 4 ^ g_window.someFlag2) & 0xc;
                     // g_supervisor.calculateSelfChecksum(); Never used anyways
-                    d3dFormat = (code*)0x0;
+                    // d3dFormat = (code*)0x0;
                     goto InitChain;
                 }
             }
@@ -289,82 +288,81 @@ int APIENTRY main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     do {
         do {
             do {
-                while (true) {
+                while (true)
+                {
                     g_soundManager.someState = 2;
                     FN_waitAndCloseGlobalHandles();
                     releaseSounds();
-                    anmManager = g_anmManager;
-                    if (g_anmManager != (AnmManager*)0x0) {
+
+                    if (g_anmManager)
+                    {
                         g_anmManager->~AnmManager();
                         free(anmManager);
                     }
+
                     g_anmManager = nullptr;
                     if (g_supervisor.surfaceR0 != nullptr)
                     {
-                        (*(g_supervisor.surfaceR0)->lpVtbl->Release)(g_supervisor.surfaceR0);
+                        g_supervisor.surfaceR0->Release();
                         g_supervisor.surfaceR0 = nullptr;
                     }
+
                     if (g_supervisor.surfaceR1 != nullptr)
                     {
                         g_supervisor.surfaceR1->Release();
                         g_supervisor.surfaceR1 = nullptr;
                     }
+
                     if (g_supervisor.backBuffer != nullptr)
                     {
                         g_supervisor.backBuffer->Release();
                         g_supervisor.backBuffer = nullptr;
                     }
+
                     if (g_supervisor.d3dDevice != nullptr)
                     {
                         g_supervisor.d3dDevice->Release();
                         g_supervisor.d3dDevice = nullptr;
                     }
+
                     if (g_supervisor.d3dInterface0 != nullptr)
                     {
                         g_supervisor.d3dInterface0->Release();
                         g_supervisor.d3dInterface0 = nullptr;
                     }
-                    if (g_window.hwnd != (HWND)0x0) {
+
+                    if (g_window.hwnd)
+                    {
                         ShowWindow(g_window.hwnd, 0);
                         MoveWindow(g_window.hwnd, 0, 0, 0, 0, 0);
                         DestroyWindow(g_window.hwnd);
-                        g_window.hwnd = (HWND)0x0;
+                        g_window.hwnd = nullptr;
                     }
+
                     do {
                         cursor_status_1 = ShowCursor(1);
                     } while (cursor_status_1 < 0);
-                    if (someWindowProcessedFlag != 2) {
-                        FN_writeToFile("th11.cfg", 0x3c, &g_supervisor.m_gameConfig);
+
+                    if (someWindowProcessedFlag != 2)
+                    {
+                        writeToFile("th11.cfg", 0x3c, &g_supervisor.m_gameConfig);
                         timeEndPeriod(1);
-                        logFunctionIdc();
+
                         g_supervisor.criticalSectionFlag = g_supervisor.criticalSectionFlag & 0xffff7fff;
-                        window_count = 0xc;
-                        /* Delete 12 critical sections */
-                        critical_section = g_supervisor.criticalSections;
-                        do {
-                            DeleteCriticalSection(critical_section);
-                            critical_section = critical_section + 1;
-                            window_count = window_count + -1;
-                        } while (window_count != 0);
+                        for (int i = 0; i < 12; ++i)
+                            DeleteCriticalSection(&g_supervisor.criticalSections[i]);
+
                         SystemParametersInfoA(0x11, g_window.primaryScreenWorkingArea, (PVOID)0x0, 2);
                         SystemParametersInfoA(0x55, g_window.mouseSpeed, (PVOID)0x0, 2);
                         SystemParametersInfoA(0x56, g_window.idk1, (PVOID)0x0, 2);
                         WINNLSEnableIME(0, 1);
-                        if (g_memoryTest != (DWORD*)0x0) {
-                            free(g_memoryTest);
-                        }
-                        check_cookie_result = 0;
-                        __security_check_cookie(stackCanary ^ (uint)&stack0xfffffec4);
-                        return check_cookie_result;
+                        return 0;
                     }
-                    g_loggingBuffer.pointer = g_loggingBuffer.buffer;
-                    g_loggingBuffer.buffer[0] = '\0';
-                    logToGlobalBuffer(&g_loggingBuffer,
-                        "再起動を要するオプションが変更されたので再起動します\r\n"
-                        , vaList);
-                    if (g_supervisor.d3dPresetParameters.Windowed == 0) {
+                    puts("再起動を要するオプションが変更されたので再起動します\n");
+
+                    if (g_supervisor.m_d3dPresetParameters.Windowed == 0)
                         WINNLSEnableIME(0, 1);
-                    }
+                   
                     d3dFormat = PeekMessageA_exref;
                     message_loop_counter = 0x3c;
                     do {
@@ -377,31 +375,30 @@ int APIENTRY main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
                     } while (message_loop_counter != 0);
                     g_supervisor.criticalSectionFlag = g_supervisor.criticalSectionFlag & 0xfffffe7f;
                 InitChain:
-                    g_chain = (Chain*)operator_new(0x4c);
+                    g_chain = (Chain*)game_new(0x4c);
                     if (g_chain == (Chain*)0x0) {
                         g_chain = (Chain*)0x0;
                     }
-                    else {
-                        (g_chain->calcChain).jobRunDrawChainCallbackOrTrackerPrev.trackerPrev = (ChainElem*)0x0
-                            ;
-                        (g_chain->calcChain).registerChainCallback = (ChainCallback*)0x0;
-                        (g_chain->calcChain).runCalcChainCallback = (ChainCallback*)0x0;
-                        (g_chain->calcChain).trackerJobNodeOrjobPriority.jobPriority = 0;
-                        calcChainNextElem = &(g_chain->calcChain).nextNode;
-                        *calcChainNextElem = (ChainElem*)((uint)*calcChainNextElem & 0xfffffffe);
-                        (g_chain->calcChain).embeddedTracker.trackerJobNode = (ChainElem*)g_chain;
-                        (g_chain->calcChain).embeddedTracker.trackerNextNode = (ChainElem*)0x0;
-                        (g_chain->calcChain).embeddedTracker.trackerPrevNode = (ChainElem*)0x0;
-                        calcChainNextElem = &(g_chain->drawChain).nextNode;
-                        *calcChainNextElem = (ChainElem*)((uint)*calcChainNextElem & 0xfffffffe);
-                        (g_chain->drawChain).jobRunDrawChainCallbackOrTrackerPrev.trackerPrev = (ChainElem*)0x0
-                            ;
-                        (g_chain->drawChain).registerChainCallback = (ChainCallback*)0x0;
-                        (g_chain->drawChain).runCalcChainCallback = (ChainCallback*)0x0;
-                        (g_chain->drawChain).trackerJobNodeOrjobPriority.jobPriority = 0;
-                        (g_chain->drawChain).embeddedTracker.trackerJobNode = &g_chain->drawChain;
-                        (g_chain->drawChain).embeddedTracker.trackerNextNode = (ChainElem*)0x0;
-                        (g_chain->drawChain).embeddedTracker.trackerPrevNode = (ChainElem*)0x0;
+                    else
+                    {
+                        // inlined constructor
+                        g_chain->calcChain.trackerPrevNode = nullptr;
+                        g_chain->calcChain.registerChainCallback = nullptr;
+                        g_chain->calcChain.runCalcChainCallback = nullptr;
+                        g_chain->calcChain.jobPriority = 0;
+                        g_chain->calcChain.nextNode = (ChainElem*)((uintptr_t)g_chain->calcChain.nextNode & ~1);
+                        g_chain->calcChain.embeddedTracker.trackerJobNode = &g_chain->calcChain;
+                        g_chain->calcChain.embeddedTracker.trackerNextNode = nullptr;
+                        g_chain->calcChain.embeddedTracker.trackerPrevNode = nullptr;
+
+                        g_chain->drawChain.nextNode = (ChainElem*)((uintptr_t)g_chain->drawChain.nextNode & ~1);
+                        g_chain->drawChain.trackerPrevNode = nullptr;
+                        g_chain->drawChain.registerChainCallback = nullptr;
+                        g_chain->drawChain.runCalcChainCallback = nullptr;
+                        g_chain->drawChain.jobPriority = 0;
+                        g_chain->drawChain.embeddedTracker.trackerJobNode = &g_chain->drawChain;
+                        g_chain->drawChain.embeddedTracker.trackerNextNode = nullptr;
+                        g_chain->drawChain.embeddedTracker.trackerPrevNode = nullptr;
                         g_chain->timeToRemove = 0;
                     }
                     checkJoystickAvailability();
@@ -417,24 +414,25 @@ int APIENTRY main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
                         0x800;
                     /* idek
                        no one seems to use this thing anyways */
-                    ThreadInf::closeThread((ThreadInf*)&g_loadingThread);
+                    // ThreadInf::closeThread((ThreadInf*)&g_loadingThread);
                     g_supervisor.d3dInterface0 = Direct3DCreate9(0x20);
                     if (g_supervisor.d3dInterface0 != (IDirect3D9*)0x0) break;
-                    CL_logError("Direct3D オブジェクトは何故か作成出来なかった\r\n");
+                    puts("Direct3D オブジェクトは何故か作成出来なかった\r\n");
                 }
-                result3 = Window::initialize(hInstance_);
+                result3 = Window::initialize(hInstance);
             } while (result3 != 0);
-            SoundManager::createThread(g_window.hwnd);
-            result4 = Supervisor::initD3d9Devices((D3DFORMAT)d3dFormat);
+            // SoundManager::createThread(g_window.hwnd);
+            // result4 = Supervisor::initD3d9Devices((D3DFORMAT)d3dFormat);
         } while (result4 != 0);
-        anmManagerBuf = (AnmManager*)operator_new(0x7bd894);
+
+        anmManagerBuf = (AnmManager*)game_malloc(0x7bd894);
         if (anmManagerBuf == (AnmManager*)0x0) {
             g_anmManager = (AnmManager*)0x0;
         }
         else {
             g_anmManager = AnmManager::initialize(anmManagerBuf);
         }
-        if (g_supervisor.d3dPresetParameters.Windowed == 0) {
+        if (g_supervisor.m_d3dPresetParameters.Windowed == 0) {
             WINNLSEnableIME(0, 0);
             do {
                 cursor_status_2 = ShowCursor(0);
@@ -448,30 +446,32 @@ int APIENTRY main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
         g_window.timeSinceLastFrame = Window::getDeltaTime();
         g_window.deltaTime = g_window.timeSinceLastFrame;
         res = SetForegroundWindow(g_window.hwnd);
-        Supervisor::initialize();
+        // Supervisor::initialize();
         if (res == 0) {
             g_window.someFlag2 = g_window.someFlag2 | 1;
             someWindowProcessedFlag = 0;
             g_window.frameskipCounter = -4;
         joined_r0x0044581d:
             do {
-                while (true) {
-                    if (g_window.timeForCleanup != 0) goto Cleanup;
+                while (true)
+                {
+                    if (g_window.timeForCleanup != 0)
+                        goto Cleanup;
                     isMessageAvailable = PeekMessageA(&tagMsg, (HWND)0x0, 0, 0, 1);
                     if (isMessageAvailable == 0) break;
                     TranslateMessage(&tagMsg);
                     DispatchMessageA(&tagMsg);
                 }
-                hr_ = (*(g_supervisor.d3dDevice)->lpVtbl->TestCooperativeLevel)(g_supervisor.d3dDevice);
+                hr_ = g_supervisor.d3dDevice->TestCooperativeLevel();
                 if (hr_ == 0) {
                     if ((g_window.someFlag2 & 2) == 0) {
                         if ((g_window.someFlag2 & 0x10) == 0) {
-                            if ((g_supervisor.d3dPresetParameters.PresentationInterval == 1) &&
+                            if ((g_supervisor.m_d3dPresetParameters.PresentationInterval == 1) &&
                                 (g_supervisor.m_gameConfig.frameSkip == '\0')) {
-                                hr_ = Window::frameIdkWhatVariationThisIs(&g_window);
+                                // hr_ = Window::frameIdkWhatVariationThisIs(&g_window);
                             }
                             else {
-                                hr_ = Window::frameFrameskip(&g_window);
+                                // hr_ = Window::frameFrameskip(&g_window);
                             }
                         }
                         else {
@@ -479,41 +479,42 @@ int APIENTRY main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
                         }
                         someWindowProcessedFlag = hr_;
                         if (hr_ != 0) break;
-                        g_supervisor.criticalSectionFlag = g_supervisor.criticalSectionFlag & 0xffffffef;
+                        g_supervisor.flags &= 0xffffffef;
                         goto joined_r0x0044581d;
                     }
                 }
-                else if (hr_ != -0x7789f797) goto joined_r0x0044581d;
+                else if (hr_ != -0x7789f797)
+                    goto joined_r0x0044581d;
                 g_window.idk2 = 10;
                 if ((g_window.someFlag2 & 2) != 0) {
                     if ((g_window.someFlag2 & 0xc) == 0) {
                         GetWindowRect(g_window.hwnd, &g_supervisor.windowDimensions);
-                        pDVar1 = &g_supervisor.d3dPresetParameters;
+                        pDVar1 = &g_supervisor.m_d3dPresetParameters;
                         puVar2 = g_supervisor.idk3;
                         for (i = 0xe; i != 0; i = i + -1) {
                             *puVar2 = pDVar1->BackBufferWidth;
                             pDVar1 = (D3DPRESENT_PARAMETERS*)&pDVar1->BackBufferHeight;
                             puVar2 = puVar2 + 1;
                         }
-                        g_supervisor.d3dPresetParameters.PresentationInterval =
+                        g_supervisor.m_d3dPresetParameters.PresentationInterval =
                             (-(uint)((g_window.someFlag2 & 0x10) != 0) & 0x7fffffff) + 1;
-                        g_supervisor.d3dPresetParameters.FullScreen_RefreshRateInHz = 0x3c;
-                        g_supervisor.d3dPresetParameters.Windowed = 0;
-                        g_supervisor.d3dPresetParameters.BackBufferFormat =
+                        g_supervisor.m_d3dPresetParameters.FullScreen_RefreshRateInHz = 0x3c;
+                        g_supervisor.m_d3dPresetParameters.Windowed = 0;
+                        g_supervisor.m_d3dPresetParameters.BackBufferFormat =
                             (uint)(g_supervisor.m_gameConfig.colorDepth != '\0') + D3DFMT_X8R8G8B8;
                     }
                     else {
-                        g_supervisor.d3dPresetParameters.BackBufferFormat =
-                            g_supervisor.d3dPresentBackBuferFormat;
-                        g_supervisor.d3dPresetParameters.FullScreen_RefreshRateInHz = 0;
+                        // g_supervisor.m_d3dPresetParameters.BackBufferFormat =
+                        //     g_supervisor.d3dPresentBackBuferFormat;
+                        g_supervisor.m_d3dPresetParameters.FullScreen_RefreshRateInHz = 0;
                         if ((g_window.someFlag2 & 0x10) == 0) {
-                            g_supervisor.d3dPresetParameters.PresentationInterval =
+                            g_supervisor.m_d3dPresetParameters.PresentationInterval =
                                 (-(uint)(g_supervisor.d3dPresentationIntervalFlag != 0x3c) & 0x7fffffff) + 1;
                         }
                         else {
-                            g_supervisor.d3dPresetParameters.PresentationInterval = 0x80000000;
+                            g_supervisor.m_d3dPresetParameters.PresentationInterval = 0x80000000;
                         }
-                        g_supervisor.d3dPresetParameters.Windowed = 1;
+                        g_supervisor.m_d3dPresetParameters.Windowed = 1;
                     }
                 }
                 g_supervisor.releaseSurfaces();
@@ -605,5 +606,6 @@ int APIENTRY main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
         }
         g_chain = nullptr;
     } while (true);
+    #endif
+    return 0;
 }
-#endif
