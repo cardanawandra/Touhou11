@@ -13,6 +13,9 @@ Makefile
 /resources/th_re_data/
 /resources/ghidra/repo
 /sdk/
+/msvc_env
+msvc_env.tar.gz
+/third_party/dxsdk
 /game_files
 
 # IDE / Editor files

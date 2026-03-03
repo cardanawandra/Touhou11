@@ -3,15 +3,23 @@ project(Touhou11)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
+
+# CMake Static Linking (/MT and /MTd) eliminates the need for vcruntime140.dll
+# set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:Release>")
+
+set(CMAKE_ASM_MASM_COMPILER "llvm-ml")
+enable_language(ASM_MASM)
 
 # DirectX SDK (June 2010)
 if (DEFINED ENV{DXSDK_DIR})
     set(DXSDK_DIR $ENV{DXSDK_DIR})
 else()
-    set(DXSDK_DIR "C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)")
+    # set(DXSDK_DIR "C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)")
+    set(DXSDK_DIR "${CMAKE_SOURCE_DIR}/third_party/dxsdk")
 endif()
 
 if (NOT EXISTS ${DXSDK_DIR})
@@ -26,8 +34,8 @@ target_link_libraries(DirectX9 INTERFACE d3d9 d3dx9 dinput8 winmm dxguid)
 add_subdirectory(third_party/imgui)
 add_subdirectory(core)
 
-# Microsoft thinks it knows best and won't run an executable it didn't build.
-# It's best if th11.exe runs directly with the local debugger without needing to attach every time.
+# It's best if th11.exe runs directly with the local debugger without needing to attach every time
+# But Microsoft thinks it knows best and won't run an executable it didn't build
 # Create a dummy source so CMake has something to compile
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp" "int main() { return 0; }")
 add_executable(Touhou11 "${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp")
