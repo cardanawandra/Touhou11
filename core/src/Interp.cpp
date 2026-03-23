@@ -3,37 +3,37 @@
 template <typename T>
 void Interp<T>::step(Interp<T>* This)
 {
-    if (This->endTime > 0)
+    if (This->m_endTime > 0)
     {
-        Timer::increment(&This->timer);
+        Timer::increment(&This->m_timer);
 
-        if (This->endTime <= This->timer.current)
+        if (This->m_endTime <= This->m_timer.m_current)
         {
-            This->timer->set(This->endTime);
+            This->m_timer.set(&This->m_timer, This->m_endTime);
             This->m_endTime = 0;
 
-            if (This->method != InterpMethod::CubicHermite)
-                return This->goal;
+            if (This->m_method != InterpMethod::CubicHermite)
+                return This->m_goal;
         }
     }
 
-    switch (This->method)
+    switch (This->m_method)
     {
         case InterpMethod::Linear:
             // "goal" acts as "speed" here.
-            This->initial += This->goal;
+            This->m_initial += This->m_goal;
 
         case InterpMethod::Physics:
             // initial = Position
             // bezier2 = Velocity
             // goal    = Acceleration
 
-            This->initial += This->bezier2; // Pos += Vel
-            This->bezier2 += This->goal;    // Vel += Accel
+            This->m_initial += This->m_bezier2; // Pos += Vel
+            This->m_bezier2 += This->m_goal;    // Vel += Accel
 
         case InterpMethod::CubicHermite:
         {
-            float t = This->timer.currentF / (float)This->endTime;
+            float t = This->m_timer.m_currentF / (float)This->m_endTime;
             float t2 = t * t;
             float t3 = t2 * t;
             float h00 = (2.0f * t3) - (3.0f * t2) + 1.0f; // H00 = 2t^3 - 3t^2 + 1
@@ -41,19 +41,19 @@ void Interp<T>::step(Interp<T>* This)
             float h01 = (-2.0f * t3) + (3.0f * t2);       // H01 = -2t^3 + 3t^2
             float h11 = t3 - t2;                          // H11 = t^3 - t^2
 
-            T term1 = h00 * This->initial; // P0
-            T term2 = h10 * This->bezier1; // M0
-            T term3 = h01 * This->goal;    // P1
-            T term4 = h11 * This->bezier2; // M1
-            This->initial = term1 + term2 + term3 + term4;
+            T term1 = h00 * This->m_initial; // P0
+            T term2 = h10 * This->m_bezier1; // M0
+            T term3 = h01 * This->m_goal;    // P1
+            T term4 = h11 * This->m_bezier2; // M1
+            This->m_initial = term1 + term2 + term3 + term4;
         }
 
         default:
         {
             float alpha = interpolate(This);
-            T delta = This->goal - This->initial;
+            T delta = This->m_goal - This->m_initial;
             T offset = delta * alpha;
-            This->initial += offset;
+            This->m_initial += offset;
         }
     }
 }
