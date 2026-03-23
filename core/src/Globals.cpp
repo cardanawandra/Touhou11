@@ -263,8 +263,8 @@ float normalizeAngle(float inputAngleRadians)
     return std::remainder(inputAngleRadians, 2.0f * D3DX_PI);
 }
 
-void decomposeSpeedMagnitudeIntoVelocityComponents(D3DXVECTOR3* velocity, float angle, float speed)
+void decomposeAngle(D3DXVECTOR3* outVec, float angle, float scale)
 {
-    velocity->x = std::cos(angle) * speed;
-    velocity->y = std::sin(angle) * speed;
+    outVec->x = std::cos(angle) * scale;
+    outVec->y = std::sin(angle) * scale;
 }

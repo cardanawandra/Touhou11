@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "AnmManager.h"
+#include "Globals.h"
 
 int Player::shootOneBullet(Player* This, D3DXVECTOR3* position, int currentTime, Shooter* shooter)
 {
@@ -87,7 +88,7 @@ int Player::shootOneBullet(Player* This, D3DXVECTOR3* position, int currentTime,
     // 0x43415a: Velocity Calculation
     if ((bullet->flags & 1) == 0)
     {
-        decomposeSpeedMagnitudeIntoVelocityComponents(&bullet->velocity, bullet->angle, bullet->speed);
+        decomposeAngle(&bullet->velocity, bullet->angle, bullet->speed);
         bullet->velocity.z = 0.0f;
     }
     else {
