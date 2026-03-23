@@ -9,6 +9,7 @@
 #include "SoundManager.h"
 #include "GameConfig.h"
 #include "InputManager.h"
+#include "LaserData.h"
 
 class AnmManager;
 class Supervisor;
@@ -19,6 +20,9 @@ struct PbgArchive;
 class Spellcard;
 struct FpsCounter;
 class Player;
+class ItemManager;
+class LaserManager;
+class EnemyManager;
 
 struct Globals
 {
@@ -93,4 +97,4 @@ byte* openFile(const char* filename, size_t* outSize, BOOL isExternalResource);
 float normalizeAngle(float inputAngleRadians);
 
 // 0x459aa0
-void decomposeSpeedMagnitudeIntoVelocityComponents(D3DXVECTOR3* velocity, float angle, float speed);
+void decomposeAngle(D3DXVECTOR3* outVec, float angle, float scale);
