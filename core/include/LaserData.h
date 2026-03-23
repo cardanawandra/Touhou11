@@ -4,27 +4,71 @@
 #include "Timer.h"
 #include "Macros.h"
 
+struct LaserDataVftable
+{
+    void* vfunction1;
+    void* vfunction2;
+    void* vfunction3;
+    void* vfunction4;
+    void* vfunction5;
+    void* vfunction6;
+    void* vfunction7;
+    void* vfunction8;
+    void* vfunction9;
+    void* vfunction10;
+    void* vfunction11;
+    void* vfunction12;
+    void* vfunction13;
+    void* vfunction14;
+    void* vfunction15;
+    void* vfunction16;
+    void* vfunction17;
+    void* vfunction18;
+    void* vfunction19;
+    void* vfunction20;
+};
+
+struct LaserTaskData
+{
+    Timer timer;            // 0x00 - 0x14
+    float float_0x14;       // 0x14
+    float float_0x18;       // 0x18
+    float float_0x1c;       // 0x1c
+    float float_0x20;       // 0x20
+    int int_0x24;           // 0x24
+    int int_0x28;           // 0x28
+    int int_0x2c;           // 0x2c
+    int int_0x30;           // 0x30
+};
+ASSERT_SIZE(LaserTaskData, 0x34);
+
 struct LaserData
 {
-    // <0x0>: LaserData_vtable* laserDataVtable
-    uint32_t laserDataVtable; // Temporary Filler
-    uint32_t a; // unknown
-    // <0x8> LaserLine_vftable* // laserLineVtable, probably incorrectly placed
-    uint32_t laserLineVtable; // Temporary Filler
-    uint32_t c; // unknown
-    uint32_t u1; // unknown
-    Timer timer;
-    uint32_t reserved1[22]; // unknown
-    LaserSegment laserSegments[17];
-    uint8_t reserved2[64]; // unknown
-    uint32_t finalFlag;
-    uint8_t reserved3[8]; // unknown
-};
-//ASSERT_SIZE(LaserData, 0x440);
+    LaserDataVftable* laserDataVtable_0x0;        // 0x00
+    uint32_t laserDataPtr_0x4;        // 0x04
+    void* laserLineVtable_0x8;        // 0x08
+    uint32_t opcode;                  // 0x0c
+    uint32_t u1_0x10;                 // 0x10
+    Timer timer_0x14;                 // 0x14
+    Timer timer_0x28;                 // 0x28
+    D3DXVECTOR3 laserBasePosition;    // 0x3c
+    D3DXVECTOR3 vec_0x48;             // 0x48
+    float laserAngle;                 // 0x54
+    float totalLength;                // 0x58
+    float someFloat_0x5c;             // 0x5c
+    float currentTime_0x60;           // 0x60
+    float someSmallFloat_0x64;        // 0x64
+    int idk0;                         // 0x68
+    int someLimit_0x6c;               // 0x6c
+    LaserTaskData tasks[18];          // 0x70
+    int instructionIndex;             // 0x418
+    uint32_t vfunc_dispatch_opcode;   // 0x41c
+    int idk14;                        // 0x420
+    Timer timer1;                     // 0x424
+    int bulletType;                   // 0x438
+    short short_0x43c;                // 0x43c
+    short short_0x43e;                // 0x43e
 
-/* Proof of sizes in asm:
-424841: b9 11 00      MOV       loopCounter,0x11 ; 17 segments
-...
-00424852 83 c0 34      ADD       laserSegment,0x34
-00424855 83 e9 01      SUB       loopCounter,0x1
-*/
+    LaserData();
+};
+ASSERT_SIZE(LaserData, 0x440);
