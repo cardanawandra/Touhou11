@@ -193,7 +193,7 @@ public:
     
     static void transformAndDraw(AnmManager* This, AnmVm* vm);
     static void loadIntoAnmVm(AnmVm* vm, AnmLoaded* anmLoaded, int scriptNumber);
-    static void putInVmList(AnmManager* This, AnmVm* vm, AnmId* anmId);
+    static void putInVmList(AnmVm* vm, AnmId* anmId);
     static void releaseAnmLoaded(AnmManager* This, AnmLoaded* anmLoaded);
     
     static int drawVmTriangleStrip(AnmManager* This, AnmVm* vm, SpecialRenderData* specialRenderData, uint32_t vertexCount);
@@ -208,7 +208,10 @@ public:
     static AnmManager* initialize(AnmManager* This);
 
     static AnmVm* getVmWithId(AnmManager* This, int anmId);
+
     static void blitTextures(AnmManager* This);
+
+    static void spawnVmAtPosition(AnmLoaded* anmLoaded, AnmId* anmId, int scriptNumber, int layer, D3DXVECTOR3* spawnLocation);
 
     static ChainCallbackResult renderLayer(AnmManager* This, int layer);
 

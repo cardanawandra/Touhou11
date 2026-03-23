@@ -425,7 +425,7 @@ void AnmManager::makeVmWithAnmLoaded(AnmLoaded* anmLoaded, int scriptNumber, int
     vm->m_flagsLow |= 0x40000000;
     vm->m_layer = anmVmLayer;
     vm->loadAnmScript(vm, anmLoaded, scriptNumber);
-    putInVmList(This, vm, anmId);
+    putInVmList(vm, anmId);
     g_supervisor.leaveCriticalSection(9);
 }
 
@@ -1251,8 +1251,9 @@ void AnmManager::loadIntoAnmVm(AnmVm* vm, AnmLoaded* anmLoaded, int scriptNumber
     memset(vm, 0, 0x434);
 }
 
-void AnmManager::putInVmList(AnmManager* This, AnmVm* vm, AnmId* anmId)
+void AnmManager::putInVmList(AnmVm* vm, AnmId* anmId)
 {
+    AnmManager* This = g_anmManager;
     AnmVmList* curVm = &vm->m_nodeInGlobalList;
     curVm->entry = vm;
     vm->m_nodeInGlobalList.next = nullptr;
@@ -1281,6 +1282,24 @@ void AnmManager::putInVmList(AnmManager* This, AnmVm* vm, AnmId* anmId)
     vm->m_id.id = This->m_id;
     anmId->id = This->m_id;
 }
+
+// 0x455b10
+void AnmManager::spawnVmAtPosition(AnmLoaded* anmLoaded,AnmId* anmId, int scriptNumber, int layer, D3DXVECTOR3* spawnLocation)
+{
+    AnmVm* vm;
+    g_supervisor.enterCriticalSection(9);
+    vm = allocateVm();
+    vm->m_flagsLow |= 0x40000000;
+    vm->m_layer = layer;
+    vm->m_entityPos.x = spawnLocation->x + 32.0 + 192.0;
+    vm->m_entityPos.y = spawnLocation->y + 16.0;
+    vm->m_entityPos.z = spawnLocation->z;
+
+    AnmVm::loadIntoAnmVm(vm,anmLoaded,scriptNumber);
+    putInVmList(vm, anmId);
+    g_supervisor.leaveCriticalSection(9);
+}
+
 
 // 0x4549e0
 void AnmManager::releaseAnmLoaded(AnmManager* This, AnmLoaded* anmLoaded)
