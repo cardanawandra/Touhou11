@@ -348,7 +348,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                         writeToFile("th11.cfg", 0x3c, &g_supervisor.m_gameConfig);
                         timeEndPeriod(1);
 
-                        g_supervisor.criticalSectionFlag = g_supervisor.criticalSectionFlag & 0xffff7fff;
+                        g_supervisor.flags = g_supervisor.flags & 0xffff7fff;
                         for (int i = 0; i < 12; ++i)
                             DeleteCriticalSection(&g_supervisor.criticalSections[i]);
 
@@ -373,7 +373,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                         }
                         message_loop_counter = message_loop_counter + -1;
                     } while (message_loop_counter != 0);
-                    g_supervisor.criticalSectionFlag = g_supervisor.criticalSectionFlag & 0xfffffe7f;
+                    g_supervisor.flags = g_supervisor.flags & 0xfffffe7f;
                 InitChain:
                     g_chain = (Chain*)game_new(0x4c);
                     if (g_chain == (Chain*)0x0) {
@@ -403,12 +403,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                     }
                     checkJoystickAvailability();
                     normalizeKeyboardState();
-                    g_supervisor.criticalSectionFlag = g_supervisor.criticalSectionFlag & 0xfffff3ff;
+                    g_supervisor.flags = g_supervisor.flags & 0xfffff3ff;
                     Supervisor::initializeInputDevices(&g_supervisor);
-                    windowHeight = g_supervisor.criticalSectionFlag ^
+                    windowHeight = g_supervisor.flags ^
                         ((uint)(g_supervisor.keyboard != (IDirectInputDevice8*)0x0) << 10 ^
-                            g_supervisor.criticalSectionFlag) & 0x400;
-                    g_supervisor.criticalSectionFlag =
+                            g_supervisor.flags) & 0x400;
+                    g_supervisor.flags =
                         windowHeight ^
                         ((uint)(g_supervisor.joystick != (IDirectInputDevice8*)0x0) << 0xb ^ windowHeight) &
                         0x800;
@@ -525,7 +525,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
                 {
                     g_supervisor.resetRenderState();
                     g_anmManager->createD3DTextures(g_anmManager);
-                    g_supervisor.criticalSectionFlag = g_supervisor.criticalSectionFlag | 0x10;
+                    g_supervisor.flags = g_supervisor.flags | 0x10;
                     g_supervisor.idk7[3] = 3;
                     if ((g_window.someFlag2 & 2) != 0)
                     {
