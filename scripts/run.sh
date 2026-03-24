@@ -5,6 +5,6 @@ else
   PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 fi
 
-cd "$PROJECT_DIR/bin/Release"
+cd "$PROJECT_DIR/bin/Debug"
 
 LANG=ja_JP.UTF-8 LC_ALL=ja_JP.UTF-8 WINEPREFIX=~/.wine32 WINEDLLOVERRIDES="d3d9=n,b" wine th11.exe

@@ -26,4 +26,4 @@ RUN ln -s /usr/bin/clang-17 /usr/bin/clang && \
 WORKDIR /workspace
 
 # We will mount the source code and msvc_env into /workspace when we run the container
-CMD ["/bin/bash", "-c", "cmake -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake -DCMAKE_BUILD_TYPE=Release && cmake --build build"]
+CMD ["/bin/bash", "-c", "cmake -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake -DCMAKE_BUILD_TYPE=Debug && cmake --build build"]
