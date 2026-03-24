@@ -1,7 +1,7 @@
-#include "LaserData.h"
+#include "LaserBase.h"
 #include "Globals.h"
 
-LaserData::LaserData()
+LaserBase::LaserBase()
 {
     this->laserDataVtable_0x0 = &g_laserDataVftable;
     this->timer_0x14.m_isInitialized &= ~1;
@@ -12,7 +12,7 @@ LaserData::LaserData()
 
     this->timer1.m_isInitialized &= ~1;
     
-    memset(this, 0, sizeof(LaserData));
+    memset(this, 0, sizeof(LaserBase));
     
     // Inline Timer Constructor for timer_0x14
     if ((this->timer_0x14.m_isInitialized & 1) == 0)

@@ -1,9 +1,9 @@
 #pragma once
-
 #include "Chireiden.h"
 #include "Macros.h"
+#include "LaserBase.h"
 
-struct LaserInfinite
+class LaserInfinite : public LaserBase
 {
 
 };

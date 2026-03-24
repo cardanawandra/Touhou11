@@ -56,10 +56,7 @@ int LaserLine::createOrDestroyLaserSegments(LaserLine* This, AnmId anmId, int ca
             }
 
             // Stride forward by 16.0 units
-            spawnLocation.x += step.x;
-            spawnLocation.y += step.y;
-            spawnLocation.z += step.z;
-            
+            spawnLocation += step;
             currentLength += 16.0f;
 
         } while (currentLength + 8.0f < This->laserData.totalLength);

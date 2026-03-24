@@ -2,11 +2,12 @@
 #include "Chireiden.h"
 #include "AnmVm.h"
 #include "Macros.h"
-#include "LaserData.h"
+#include "LaserBase.h"
 
-struct LaserLine// : public LaserData
+class LaserLine : public LaserBase
 {
-    LaserData laserData;
+public:
+    //LaserBase laserBase;
     float float_0x440;
     float float_0x444;
     int int_0x448;
@@ -23,4 +24,4 @@ struct LaserLine// : public LaserData
 
     static int createOrDestroyLaserSegments(LaserLine* This, AnmId anmId, int cancelFlag);
 };
-// ASSERT_SIZE(LaserLine, 0xe8c);
+ASSERT_SIZE(LaserLine, 0xe8c);

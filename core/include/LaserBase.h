@@ -4,7 +4,7 @@
 #include "Timer.h"
 #include "Macros.h"
 
-struct LaserDataVftable
+struct LaserBaseVftable
 {
     void* vfunction1;
     void* vfunction2;
@@ -42,9 +42,10 @@ struct LaserTaskData
 };
 ASSERT_SIZE(LaserTaskData, 0x34);
 
-struct LaserData
+class LaserBase
 {
-    LaserDataVftable* laserDataVtable_0x0;        // 0x00
+public:
+    LaserBaseVftable* laserDataVtable_0x0;        // 0x00
     uint32_t laserDataPtr_0x4;        // 0x04
     void* laserLineVtable_0x8;        // 0x08
     uint32_t opcode;                  // 0x0c
@@ -69,6 +70,6 @@ struct LaserData
     short short_0x43c;                // 0x43c
     short short_0x43e;                // 0x43e
 
-    LaserData();
+    LaserBase();
 };
-ASSERT_SIZE(LaserData, 0x440);
+ASSERT_SIZE(LaserBase, 0x440);

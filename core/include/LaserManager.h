@@ -3,21 +3,27 @@
 #include "AnmLoaded.h"
 #include "Chain.h"
 #include "Chireiden.h"
-#include "LaserData.h"
+#include "LaserBase.h"
+#include "LaserInfinite.h"
+#include "LaserLine.h"
 #include "LaserSegment.h"
 #include "Macros.h"
 
 class LaserManager
 {
 public:
-    AnmLoaded laserAnm;
     uint32_t unk[2];
     ChainElem* chainElem0;
     ChainElem* chainElem1;
-    LaserData laserData;
-    void* vfunc; // need to verify  
-    int someCountdown;
+    LaserBase laserData;
+    LaserBase* pLaserData;
+    int numLasersMaybe;
     int someLimit;
-    uint32_t unk1[8];
+    D3DXVECTOR3 playerPos;
+    int idk[3];
+    AnmLoaded* laserAnm;
+    int idk2;
+
+    static int allocateNewLaser(BOOL isLaserLine);
 };
-// ASSERT_SIZE(LaserManager, 0x47c);
+ASSERT_SIZE(LaserManager, 0x47c);
