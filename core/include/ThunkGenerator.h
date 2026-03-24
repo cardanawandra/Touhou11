@@ -49,6 +49,8 @@ struct Reg
     static constexpr RegCode regCode = R;
 };
 
+struct Void {};
+
 template<typename T> 
 struct IsRegWrapper : std::false_type {};
 
@@ -243,26 +245,17 @@ public:
 template<typename First, typename... Rest>
 void ProcessArgsReverse(CodeEmitter& e)
 {
-    // If this is a Return wrapper, skip it during argument processing
-    if constexpr (IsReturnWrapper<First>::value)
-    {
-        if constexpr (sizeof...(Rest) > 0)
-            ProcessArgsReverse<Rest...>(e);
-        return;
-    }
-
     if constexpr (sizeof...(Rest) > 0) // Recurse first (Right-to-Left processing)
         ProcessArgsReverse<Rest...>(e);
 
     using T = First;
     if constexpr (IsRegWrapper<T>::value) // Register
         e.pushReg(IsRegWrapper<T>::regCode);
-
-    else if constexpr (!IsRegWrapper<T>::value && !IsReturnWrapper<T>::value)  // Only other case is Stack
-        e.pushStack(T::offset + 4); // +4 to account for for ebp push
+    else // Only other case is Stack
+        e.pushStack(T::offset + 4); // +4 to account for ebp push
 }
 
-template <typename... Args, typename F>
+template <typename RetLoc, typename... ArgLocs, typename F>
 void* createLtoThunk(F targetFunc, int retN)
 {
     void* targetPtr = reinterpret_cast<void*>(targetFunc);
@@ -274,8 +267,9 @@ void* createLtoThunk(F targetFunc, int retN)
     e.addByte(0x9C);    // pushfd
     e.addByte(0x60);    // pushad
 
-    // Process arguments
-    ProcessArgsReverse<Args...>(e);
+    // Process arguments (ArgLocs explicitly isolated from RetLoc)
+    if constexpr (sizeof...(ArgLocs) > 0)
+        ProcessArgsReverse<ArgLocs...>(e);
 
     // Call Target
     e.addByte(0xB8);
@@ -283,7 +277,7 @@ void* createLtoThunk(F targetFunc, int retN)
     e.addWord(0xD0FF); // call eax
 
     // Cleanup Hook Arguments
-    constexpr int realArgCount = (sizeof...(Args)) - (IsReturnWrapper<Args>::value + ... + 0);
+    constexpr int realArgCount = sizeof...(ArgLocs);
     uint8_t stackCleanup = realArgCount * 4;
 
     if (stackCleanup > 0)
@@ -292,13 +286,12 @@ void* createLtoThunk(F targetFunc, int retN)
         e.addByte(stackCleanup);
     }
 
-    // Handle Return Value
-    using First = std::tuple_element_t<0, std::tuple<Args..., void>>;
-    if constexpr (IsReturnWrapper<First>::value)
+    // Handle Return Value directly via RetLoc
+    if constexpr (IsRegWrapper<RetLoc>::value)
     {
-        constexpr RegCode r = First::regCode;
+        constexpr RegCode r = IsRegWrapper<RetLoc>::regCode;
 
-        // Only overwrite if it's a GP register (EAX, ECX, etc)
+        // Only overwrite if it's a GP register
         if (static_cast<uint32_t>(r) & 0x0400)
             e.overwriteSavedReg(r);
     }
@@ -320,8 +313,6 @@ void* createLtoThunk(F targetFunc, int retN)
 
     return e.finalize();
 }
-
-// Reverse Thunk Generator
 
 // Container for the mapping layout
 template <typename... Locs>
@@ -358,7 +349,6 @@ void processArgs(CodeEmitter& e, std::index_sequence<Is...>)
 
     ([&]() {
         using Stor = std::tuple_element_t<Is, TupleS>;
-        // Check if Stor is Reg<C>
         if constexpr (requires { Stor::regCode; })
         {
             constexpr int srcOffset = 8 + (Is * 4); // Arg0 is at EBP + 8.
@@ -380,11 +370,8 @@ struct ThunkGenerator<Storage<RetLoc, ArgLocs...>, Signature<RetType, ArgTypes..
     {
         CodeEmitter e;
 
-        // --- 1. Prologue & Preservation ---
         e.addByte(0x55); // push ebp
         e.addWord(0xE589); // mov ebp, esp
-
-        // Save Flags and ALL Registers
         e.addByte(0x9C); // pushfd
         e.addByte(0x60); // pushad (Order: EAX, ECX, EDX, EBX, ESP, EBP, ESI, EDI)
 
@@ -418,8 +405,10 @@ struct ThunkGenerator<Storage<RetLoc, ArgLocs...>, Signature<RetType, ArgTypes..
         // Saved EAX is at [EBP - 8].
 
         //FIXME: ONLY EAX SUPPORT RIGHT NOW
-        if constexpr (requires { RetLoc::Location::regCode; }) {
-            if constexpr (RetLoc::Location::regCode == RegCode::EAX) {
+        if constexpr (requires { RetLoc::Location::regCode; })
+        {
+            if constexpr (RetLoc::Location::regCode == RegCode::EAX)
+            {
                 // MOV [EBP - 8], EAX  (89 45 F8)
                 e.addByte(0x89); e.addByte(0x45); e.addByte(0xF8);
             }
@@ -431,7 +420,7 @@ struct ThunkGenerator<Storage<RetLoc, ArgLocs...>, Signature<RetType, ArgTypes..
         // LEA ESP, [EBP - 0x24]
         e.addByte(0x8D); e.addByte(0x65); e.addByte(0xDC);
 
-        e.addByte(0x61); // popad (Restores registers, loads our RetVal into EAX)
+        e.addByte(0x61); // popad
         e.addByte(0x9D); // popfd
         e.addByte(0x5D); // pop ebp
         e.addByte(0xC3); // ret
