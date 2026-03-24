@@ -1,8 +1,10 @@
 #include "EclManager.h"
 #include "EnemyManager.h"
+#include <cstdio>
 
 int EclManager::parse(EclManager* This, EclFile* eclFile)
 {
+    puts("Parsing\n");
     This->eclFiles[This->fileCount] = eclFile;
     
     // Verify "SCPT" magic
@@ -54,6 +56,7 @@ int EclManager::parse(EclManager* This, EclFile* eclFile)
                     break;
             }
             
+            // printf("Inserting ECL sub %s\n", newSubs[insertIdx].name);
             // Shift existing subroutines rightward to make room
             for (int j = oldSize; j > insertIdx; j--)
                 newSubs[j] = newSubs[j - 1];
@@ -77,6 +80,8 @@ int EclManager::parse(EclManager* This, EclFile* eclFile)
 
 int EclManager::loadInclude(EclManager* This, EclInclude* eclInclude)
 {
+    puts("Loading ECL include file");
+
     // Check for "ANIM" (0x4D494E41)
     if (eclInclude->magic != 'MINA')
         return 0;
@@ -112,7 +117,7 @@ int EclManager::loadInclude(EclManager* This, EclInclude* eclInclude)
         currentName += 4 - (alignOffset % 4);
     }
 
-    // 3. Process "ECLI" (0x494C4345) chunk, if present
+    // Process "ECLI" (0x494C4345) chunk, if present
     if (*(uint32_t*)currentName == 'ILCE')
     {
         uint32_t ecliCount = *(uint32_t*)(currentName + 4);
