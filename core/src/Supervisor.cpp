@@ -664,16 +664,16 @@ void Supervisor::setupCameras(Supervisor* This)
 {
     if (This->surfaceR0 == nullptr)
     {
-        IDirect3DTexture9* tex = This->someAnmLoaded->m_anmLoadedD3D[2].m_texture;
+        IDirect3DTexture9* tex = This->textAnm->m_anmLoadedD3D[2].m_texture; // ??
         tex->GetSurfaceLevel(0, &This->surfaceR0);
-        This->arcadeVm0->loadIntoAnmVm(This->arcadeVm0, This->someAnmLoaded, 0x51);
+        This->arcadeVm0->loadIntoAnmVm(This->arcadeVm0, This->textAnm, 0x51);
         if (This->surfaceR0 == nullptr)
             memcpy(&This->stageCam, &This->cam0, sizeof(Camera));
     
-        tex = This->someAnmLoaded->m_anmLoadedD3D[3].m_texture;
+        tex = This->textAnm->m_anmLoadedD3D[3].m_texture;
         tex->GetSurfaceLevel(0, &This->surfaceR1);
-        This->arcadeVm1->loadIntoAnmVm(This->arcadeVm1, This->someAnmLoaded, 0x52);
-        This->arcadeVm2->loadIntoAnmVm(This->arcadeVm2, This->someAnmLoaded, 0x51);
+        This->arcadeVm1->loadIntoAnmVm(This->arcadeVm1, This->textAnm, 0x52);
+        This->arcadeVm2->loadIntoAnmVm(This->arcadeVm2, This->textAnm, 0x51);
         This->d3dDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &This->backBuffer);
     }
 }

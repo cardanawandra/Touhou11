@@ -56,7 +56,7 @@ public:
     int idk7[5];                                 // <0x568>
     uint32_t m_noVerticalSyncFlag;               // <0x57c>
     int idk8[2];                                 // <0x580>
-    AnmLoaded* someAnmLoaded;                    // <0x588>
+    AnmLoaded* textAnm;                          // <0x588>
     int idk9;                                    // <0x58c>
     uint32_t flags;                              // <0x590>
     DWORD currentTime;                           // <0x594>
