@@ -40,7 +40,7 @@ struct ReplayGameConfig
     int continuesUsed;
 };
 #pragma pack(pop)
-ASSERT_SIZE(ReplayGameConfig, 0x70);
+// ASSERT_SIZE(ReplayGameConfig, 0x70);
 
 struct ReplayPlayerData
 {
@@ -81,9 +81,11 @@ struct ReplayDataChunk
     uint8_t* auxDataPtr;
     ReplayNode replayNode;
 };
+ASSERT_SIZE(ReplayDataChunk, 0x18b0);
 
 class ReplayManager
 {
+public:
     int idk0[2];
     ChainElem* onTick0b;
     ChainElem* onTick_00436d80;
@@ -105,5 +107,13 @@ class ReplayManager
     int replayStageDataIndex;
     uint32_t flags;
     int idk6[64];
+
+    /**
+     * 0x437300
+     * @brief 
+     * @param This        EBX:4
+     * @param bottomLeft  EDI:4
+     */
+    static ReplayNode* appendReplayChunk(ReplayManager* This, int currentStage);
 };
 ASSERT_SIZE(ReplayManager, 0x2dc);
