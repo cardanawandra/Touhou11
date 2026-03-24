@@ -1,5 +1,6 @@
 #pragma once
 #include "Chireiden.h"
+#include "Macros.h"
 
 struct Timer
 {
@@ -18,3 +19,4 @@ public:
 
     static void set(Timer* This, int time);
 };
+ASSERT_SIZE(Timer, 0x14);
