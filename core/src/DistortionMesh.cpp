@@ -1,7 +1,5 @@
 #include "DistortionMesh.h"
 #include "AnmManager.h"
-#include "AnmLoaded.h"
-#include "Supervisor.h"
 
 #if 0
 DistortionMesh::DistortionMesh(int numRows, int numColumns, BOOL mode)
@@ -25,7 +23,7 @@ DistortionMesh::DistortionMesh(int numRows, int numColumns, BOOL mode)
     m_meshData = new RenderVertex144[numRows * numColumns];
     m_positions = new D3DXVECTOR3[numRows * numColumns];
 
-    void (*setupFunc)(AnmId*, int) = (mode == 0) ? setupSpecialRenderData : setupSpecialRenderDataAlt;
+    auto setupFunc = (mode == 0) ? setupSpecialRenderData : setupSpecialRenderDataAlt;
 
     if (stripCount > 0)
     {
@@ -52,15 +50,16 @@ DistortionMesh::DistortionMesh(int numRows, int numColumns, BOOL mode)
 // 0x42b3d0
 void DistortionMesh::setupSpecialRenderData(AnmId* anmId, int numColumns)
 {
-    g_supervisor.someAnmLoaded->makeVm(anmId, 0x51, 0x1b);
-    AnmVm* vm = g_anmManager->getVmWithId(*anmId);
+    g_anmManager->makeVmWithAnmLoaded(g_supervisor.textAnm, 0x51, 0x1b, anmId);
+    AnmVm* vm = g_anmManager->getVmWithId(g_anmManager, anmId->id);
     if (vm == nullptr)
     {
         anmId->id = 0;
         return;
     }
 
-    RenderVertex144* renderData = new RenderVertex144[numColumns * 2];
+    // RenderVertex144* renderData = new RenderVertex144[numColumns * 2];
+    RenderVertex144* renderData = (RenderVertex144*) game_malloc(numColumns * 2 * sizeof(RenderVertex144));
     vm->m_specialRenderData = renderData;
 
     if (numColumns < 3)
@@ -84,8 +83,9 @@ void DistortionMesh::setupSpecialRenderData(AnmId* anmId, int numColumns)
 // Identical structure to default, but with different makeVm params (script 0x52, sprite 0x1c).
 void DistortionMesh::setupSpecialRenderDataAlt(AnmId* anmId, int numColumns)
 {
-    g_supervisor.someAnmLoaded->makeVm(anmId, 0x52, 0x1c);
-    AnmVm* vm = g_anmManager->getVmWithId(*anmId);
+    g_anmManager->makeVmWithAnmLoaded(g_supervisor.textAnm, 0x52, 0x1c, anmId);
+    
+    AnmVm* vm = g_anmManager->getVmWithId(g_anmManager, anmId->id);
     if (vm == nullptr)
     {
         anmId->id = 0;

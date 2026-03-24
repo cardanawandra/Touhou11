@@ -43,7 +43,7 @@ void AsciiManager::spawnAnm(AnmLoaded* anmLoaded, AnmId* outAnmId, int scriptNum
     vm->m_entityPos.y = spawnPosition->y;
     vm->m_entityPos.z = spawnPosition->z;
     g_anmManager->loadIntoAnmVm(vm, anmLoaded, scriptNumber);
-    g_anmManager->putInVmList(g_anmManager, vm, outAnmId);
+    g_anmManager->putInVmList(vm, outAnmId);
     g_supervisor.leaveCriticalSection(9);
 }
 
