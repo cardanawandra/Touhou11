@@ -35,16 +35,31 @@ public:
     uint32_t u1;
     int someBuffer[1024];
 
-    // 0x45d900 (vfunction1)
+    /**
+     * 0x45d900 (vfunction1)
+     * @brief 
+     * @param This    ECX:4
+     * @param eclFile Stack[0x4]:4
+     */
     static int parse(EclManager* This, EclFile* eclFile);
 
     // 0x40ffa0
     // static int base_vfunc2(EnemyController* This, EclInclude* eclInclude);
 
-    // 0x410d50 (vfunction2)
+    /**
+     * 0x410d50 (vfunction2)
+     * @brief 
+     * @param This       ECX:4
+     * @param eclInclude Stack[0x4]:4
+     */
     static int loadInclude(EclManager* This, EclInclude* eclInclude);
 
-    // 0x4104d0 (vfunction3)
+    /**
+     * 0x4104d0 (vfunction3)
+     * @brief 
+     * @param This    ECX:4
+     * @param eclPath Stack[0x4]:4
+     */
     static int cacheAndParse(EclManager* This, const char* eclPath);
 };
 ASSERT_SIZE(EclManager, 0x1098);
