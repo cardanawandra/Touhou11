@@ -4,12 +4,13 @@
 #include "Player.h"
 #include "Shottypes.h"
 #include "SoundManager.h"
+#include "Chain.h"
 
 ChainCallbackResult Bomb::onTick(Bomb* This)
 {
     puts("bomb on tick\n");
     if (This->isUsingBomb == FALSE)
-        return Continue;
+        return ChainCallbackResult::Continue;
 
     int result = 0;
     switch (g_globals.character)
@@ -49,13 +50,13 @@ ChainCallbackResult Bomb::onTick(Bomb* This)
     if (result != 0)
     {
         This->isUsingBomb = FALSE;
-        return Continue;
+        return ChainCallbackResult::Continue;
     }
 
     // Increment the bomb timer.
     // This runs if the bomb is active (isUsingBomb != 0) and did not finish this tick.
     Timer::increment(&This->timer0);
-    return Continue;
+    return ChainCallbackResult::Continue;
 }
 
 int Bomb::onTickReimuA(Bomb* This)
