@@ -4,6 +4,7 @@
 #include "Shottypes.h"
 #include "Timer.h"
 #include "ThunkGenerator.h"
+#include "Vectors.h"
 
 struct Globals
 {
@@ -74,4 +75,4 @@ byte* openFile(const char* filename, size_t* outSize, BOOL isExternalResource);
 float normalizeAngle(float inputAngleRadians);
 
 // 0x459aa0
-void decomposeAngle(D3DXVECTOR3* outVec, float angle, float scale);
+void decomposeAngle(Float3* outVec, float angle, float scale);

@@ -263,7 +263,7 @@ float normalizeAngle(float inputAngleRadians)
     return std::remainder(inputAngleRadians, 2.0f * D3DX_PI);
 }
 
-void decomposeAngle(D3DXVECTOR3* outVec, float angle, float scale)
+void decomposeAngle(Float3* outVec, float angle, float scale)
 {
     outVec->x = std::cos(angle) * scale;
     outVec->y = std::sin(angle) * scale;
