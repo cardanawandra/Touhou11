@@ -9,8 +9,8 @@
 
 struct BoundingBox3
 {
-    D3DXVECTOR3 minPos;
-    D3DXVECTOR3 maxPos;
+    Float3 minPos;
+    Float3 maxPos;
 };
 
 struct Shooter
@@ -18,8 +18,8 @@ struct Shooter
     uint8_t fireRate;
     uint8_t startDelay;
     uint16_t damage;
-    D3DXVECTOR2 offset;
-    D3DXVECTOR2 hitbox;
+    Float2 offset;
+    Float2 hitbox;
     float angle;
     float speed;
     uint8_t option;
@@ -37,8 +37,8 @@ ASSERT_SIZE(Shooter, 0x34);
 struct PlayerBullet
 {
     Timer timer0;
-    D3DXVECTOR3 position;
-    D3DXVECTOR3 velocity;
+    Float3 position;
+    Float3 velocity;
     float speed;
     float angle;
     float smth;
@@ -75,7 +75,7 @@ struct PlayerOption
     int idk6;
     AnmId anmIds[2];
     int idk7[4];
-    D3DXVECTOR2 someOtherFloat;
+    Float2 someOtherFloat;
     int optionId;
     int resetFlagMaybe;
     int idk8;
@@ -89,7 +89,7 @@ struct PlayerDamageSource
     float argf0;
     float argf1;
     int idk[4];
-    D3DXVECTOR3 centerPosition;
+    Float3 centerPosition;
     int idk2[10];
     Timer timer;
     int argi1;
@@ -110,22 +110,22 @@ public:
     AnmLoaded* playerAnm;                                  // <0x10>
     AnmVm vm0;                                             // <0x14>
     AnmVm vm1;                                             // <0x448>
-    D3DXVECTOR3 position;                                  // <0x87c>
+    Float3 position;                                       // <0x87c>
     Int2 posSubpixel;                                      // <0x888>
     int normalSpeedSubpixel;                               // <0x990>
     int focusSpeedSubpixel;                                // <0x894>
     int normalSpeedSubpixelOverSqrt2;                      // <0x898>
     int focusSpeedSubpixelOverSqrt2;                       // <0x89c>
-    D3DXVECTOR3 attemptedDeltaPosSubpixel;                 // <0x8a0>
-    D3DXVECTOR3 lastNonzeroAttemptedDeltaPosSubpixel;      // <0x8ac>
+    Float3 attemptedDeltaPosSubpixel;                      // <0x8a0>
+    Float3 lastNonzeroAttemptedDeltaPosSubpixel;           // <0x8ac>
     Int2 attemptedDeltaPosISubpixel;                       // <0x8b8>
     int idk2;                                              // <0x8c0>
     int idk3;                                              // <0x8c4>
     int idk4;                                              // <0x8c8>
     BoundingBox3 hurtbox;                                  // <0x8cc>
-    D3DXVECTOR3 hurtboxHalfSize;                           // <0x8e4>
-    D3DXVECTOR3 itemAttractBoxUnfocusedHalfSize;           // <0x8f0>
-    D3DXVECTOR3 itemAttractBoxFocusedHalfSize;             // <0x8fc>
+    Float3 hurtboxHalfSize;                                // <0x8e4>
+    Float3 itemAttractBoxUnfocusedHalfSize;                // <0x8f0>
+    Float3 itemAttractBoxFocusedHalfSize;                  // <0x8fc>
     int idk5[3];                                           // <0x908>
     Int2 attemptedVelocityInternal;                        // <0x914>
     int attemptedDirection;                                // <0x91c>
@@ -157,7 +157,7 @@ public:
     int isFocused;                                         // <0x8c20>
 
     // 0x433a90
-    static PlayerDamageSource* createDamageSource(Player* This, D3DXVECTOR3* x, float argF0, float argF1, int currentTime, int argi1);
+    static PlayerDamageSource* createDamageSource(Player* This, Float3* x, float argF0, float argF1, int currentTime, int argi1);
 
     // 0x4327d0
     static void idk0(Player* This);
@@ -202,7 +202,7 @@ public:
     static int shootingTick(Player* This, /*EnemyManager* enemyManager,*/ int someNumber);
 
     // 0x433f90
-    static int shootOneBullet(Player* This, D3DXVECTOR3* position, int currentTime, Shooter* shooter);
+    static int shootOneBullet(Player* This, Float3* position, int currentTime, Shooter* shooter);
 
     // 0x434440
     static int tickBullets(Player* This);
@@ -211,6 +211,6 @@ public:
     static void timerRelated(Player* This, uint8_t di);
 
     // 0x432a90
-    static void useBomb();
+    static int useBomb();
 };
 ASSERT_SIZE(Player, 0x8d24);

@@ -8,20 +8,20 @@
 int LaserLine::createOrDestroyLaserSegments(LaserLine* This, AnmId anmId, int cancelFlag)
 {
     // If the flag is set but this bullet type doesn't support it, abort?
-    if (cancelFlag != 0 && This->laserData.bulletType != 0)
+    if (cancelFlag != 0 && This->bulletType != 0)
         return 0;
 
     int count = 0;
     float currentLength = 8.0f;
-    D3DXVECTOR3 step;
-    decomposeAngle(&step, This->laserData.laserAngle, 8.0f);
+    Float3 step;
+    decomposeAngle(&step, This->laserAngle, 8.0f);
 
     // spawnLocation is the base position of the laser. We start spawning 8.0 units ahead.
-    D3DXVECTOR3 spawnLocation;
-    spawnLocation = This->laserData.laserBasePosition + step;
+    Float3 spawnLocation;
+    spawnLocation = This->laserBasePosition + step;
 
     step *= 2; // Double the step vector to 16.0 units for the loop stride
-    if (16.0f < This->laserData.totalLength)
+    if (16.0f < This->totalLength)
     {
         do
         {
@@ -30,7 +30,7 @@ int LaserLine::createOrDestroyLaserSegments(LaserLine* This, AnmId anmId, int ca
             // Spawn an Anm node for the laser line
             int scriptNumber = This->scriptNumber * 2 + 2; // ??
             g_anmManager->spawnVmAtPosition(
-                &g_laserManager->laserAnm, 
+                g_laserManager->laserAnm, 
                 &anmId, 
                 scriptNumber, 
                 22,
@@ -59,9 +59,9 @@ int LaserLine::createOrDestroyLaserSegments(LaserLine* This, AnmId anmId, int ca
             spawnLocation += step;
             currentLength += 16.0f;
 
-        } while (currentLength + 8.0f < This->laserData.totalLength);
+        } while (currentLength + 8.0f < This->totalLength);
     }
 
-    This->laserData.opcode = 1;
+    This->opcode = 1;
     return count;
 }

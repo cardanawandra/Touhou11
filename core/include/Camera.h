@@ -1,15 +1,16 @@
 #pragma once
 #include "Chireiden.h"
 #include "Macros.h"
+#include "Vectors.h"
 
 struct Camera
 {
-    D3DXVECTOR3 offset;
-    D3DXVECTOR3 target;
-    D3DXVECTOR3 up;
-    D3DXVECTOR3 v3;
-    D3DXVECTOR3 callibration;
-    D3DXVECTOR3 eye;
+    Float3 offset;
+    Float3 target;
+    Float3 up;
+    Float3 v3;
+    Float3 callibration;
+    Float3 eye;
     float fovY;
     D3DXMATRIX viewMatrix;
     D3DXMATRIX projectionMatrix;
@@ -17,7 +18,7 @@ struct Camera
     uint32_t idk;
     float m_globalRenderQuadOffsetX;
     float m_globalRenderQuadOffsetY;
-    D3DXVECTOR3 interpAmt;
+    Float3 interpAmt;
     float fogEnd;
     float fogStart;
     float fogB;

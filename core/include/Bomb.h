@@ -19,8 +19,8 @@ struct Bomb
     AnmVm vm;
     void* unknownHeapAllocated;
     DistortionMesh* distortionMesh;
-    D3DXVECTOR3 playerPos;
-    D3DXVECTOR2 someVec2;
+    Float3 playerPos;
+    Float2 someVec2;
     uint32_t someIndicator;
     int idk3;
 

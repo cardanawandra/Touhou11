@@ -1,28 +1,9 @@
 #pragma once
 #include "Chireiden.h"
+#include "GeneratedSymbols.h"
 #include "Shottypes.h"
 #include "Timer.h"
-#include "RenderVertex.h"
-#include "Lzss.h"
-#include "Rng.h"
-#include "Supervisor.h"
-#include "SoundManager.h"
-#include "GameConfig.h"
-#include "InputManager.h"
-#include "LaserData.h"
-
-class AnmManager;
-class Supervisor;
-class AsciiManager;
-struct Chain;
-class Window;
-struct PbgArchive;
-class Spellcard;
-struct FpsCounter;
-class Player;
-class ItemManager;
-class LaserManager;
-class EnemyManager;
+#include "ThunkGenerator.h"
 
 struct Globals
 {
@@ -55,17 +36,13 @@ struct Globals
 };
 ASSERT_SIZE(Globals, 0x78);
 
-#define X_VAR(type, name, addr) \
-    using __Type_##name = type; \
-    inline __Type_##name& name = *reinterpret_cast<__Type_##name*>(addr);
+//X_FUNC(void, game_free, 0x45fd49, (void* memory))
+//X_FUNC(void*, game_malloc, 0x460192, (size_t size))
+//X_FUNC(void*, game_new, 0x45FCE4, (size_t size))
 
-#define X_FUNC(ret, name, addr, params) \
-    inline auto& name = *reinterpret_cast<ret (*) params>(addr);
-
-#include "symbols.inc"
-
-#undef X_VAR
-#undef X_FUNC
+inline auto game_free = reinterpret_cast<void(*)(void*)>(0x45FD49);
+inline auto game_malloc = reinterpret_cast<void* (*)(size_t)>(0x460192);
+inline auto game_new = reinterpret_cast<void* (*)(size_t)>(0x45FCE4);
 
 extern D3DFORMAT g_d3dFormats[];
 extern uint32_t g_bytesPerPixelLookupTable[];

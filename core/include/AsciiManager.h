@@ -7,9 +7,9 @@
 struct AsciiString
 {
     char text[256];
-    D3DXVECTOR3 pos;
+    Float3 pos;
     D3DCOLOR color;
-    D3DXVECTOR2 scale;
+    Float2 scale;
     int alignV;
     int alignH;
     int fontId;
@@ -34,7 +34,7 @@ public:
     AsciiString m_strings[STRING_ARRAY_SIZE];
     int m_numStrings;
     D3DCOLOR m_color;
-    D3DXVECTOR2 scale;
+    Float2 scale;
     int alignH;
     int idk;
     int drawShadows;
@@ -57,7 +57,7 @@ public:
      * @param string   ECX:4
      * @param position EBX:4
      */
-    static void loadAsciiStrings(AsciiManager* This, const char* string, D3DXVECTOR3* position);
+    static void loadAsciiStrings(AsciiManager* This, const char* string, Float3* position);
 
     /**
      * 0x455a70
@@ -68,7 +68,7 @@ public:
      * @param vmLayer       Stack[0x10]:4
      * @param spawnPosition EAX:4
      */
-    static void spawnAnm(AnmLoaded* anmLoaded, AnmId* outAnmId, int scriptNumber, int vmLayer, D3DXVECTOR3* spawnPosition);
+    static void spawnAnm(AnmLoaded* anmLoaded, AnmId* outAnmId, int scriptNumber, int vmLayer, Float3* spawnPosition);
 
     void spawnUnknownEffect(float x, float y);
 };

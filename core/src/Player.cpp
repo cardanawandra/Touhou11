@@ -1,8 +1,9 @@
-#include "Player.h"
 #include "AnmManager.h"
+#include "Bomb.h"
 #include "Globals.h"
+#include "Player.h"
 
-int Player::shootOneBullet(Player* This, D3DXVECTOR3* position, int currentTime, Shooter* shooter)
+int Player::shootOneBullet(Player* This, Float3* position, int currentTime, Shooter* shooter)
 {
     if (shooter->kind == 4 && This->shooterOptions[shooter->option] != 0)
         return 0;
@@ -162,7 +163,7 @@ PostVmLogic:
     return 0;
 }
 
-PlayerDamageSource* Player::createDamageSource(Player* This, D3DXVECTOR3* v, float argF0, float argF1, int currentTime, int argi1)
+PlayerDamageSource* Player::createDamageSource(Player* This, Float3* v, float argF0, float argF1, int currentTime, int argi1)
 {
     PlayerDamageSource* ds = This->damageSources;
     for (int i = 0; i < 32; ++i)
@@ -171,7 +172,7 @@ PlayerDamageSource* Player::createDamageSource(Player* This, D3DXVECTOR3* v, flo
         {
             memset(ds, 0, 0x74);
             ds->flags = ds->flags | 3;
-            memset(&ds->centerPosition, 0, 0x34); // Okay, there's some more stuff here than just one d3dxvector3... what struct is this?
+            memset(&ds->centerPosition, 0, 0x34); // Okay, there's some more stuff here than just one Float3... what struct is this?
             ds->centerPosition.x = v->x;
             ds->centerPosition.y = v->y;
             ds->centerPosition.z = v->z;
@@ -403,7 +404,7 @@ int Player::move(Player* This)
         This->anmIdFocusedHitbox.id = 0;
     }
     else {
-        D3DXVECTOR3 hitboxVec;
+        Float3 hitboxVec;
         // The game often adds offsets (like +32+192) to move from game-space to screen-space 
         hitboxVec.x = This->position.x + 224.0f;
         hitboxVec.y = This->position.y + 16.0f;
@@ -422,3 +423,57 @@ void Player::setIframes(int currentTime)
 {
     g_player->timerIFrames.set(&g_player->timerIFrames, currentTime);
 }
+
+int Player::useBomb()
+{
+    uint32_t uVar1;
+    
+    if (g_bomb->isUsingBomb != 0)
+        return -1;
+
+    g_bomb->isUsingBomb = 1;
+    g_bomb->timer0.reset();
+
+    if (((g_spellcard->flags & 1) == 0) || ((g_spellcard->timer).current < 0x3c)) {
+    This->someIndicator = 0;
+    }
+    else {
+    This->someIndicator = 1;
+    }
+    SoundManager::playSoundWithPan((g_player->position).x,0x26);
+
+    switch (g_globals.character)
+    {
+    case CharacterId::Reimu:
+        switch (g_globals.subshot)
+        {
+        case SubshotId::TypeA:
+            g_bomb->startReimuA(g_bomb);
+            break;
+        case SubshotId::TypeB:
+            g_bomb->startReimuB(g_bomb);
+            break;
+        case SubshotId::TypeC:
+            g_bomb->startReimuC(g_bomb);
+            break;
+        }
+        break;
+
+    case CharacterId::Marisa:
+        switch (g_globals.subshot)
+        {
+        case SubshotId::TypeA:
+            g_bomb->startMarisaA(g_bomb);
+            break;
+        case SubshotId::TypeB:
+            g_bomb->startMarisaB(g_bomb);
+            break;
+        case SubshotId::TypeC:
+            g_bomb->startMarisaC(g_bomb);
+            break;
+        }
+        break;
+    }
+    return 0;
+}
+

@@ -2,7 +2,7 @@
 
 void ItemManager::spawnItem(
     ItemManager* This,
-    D3DXVECTOR3* spawnLocation,
+    Float3* spawnLocation,
     int someMode,
     D3DCOLOR param_3,
     float angle,

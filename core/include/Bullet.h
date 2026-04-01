@@ -4,6 +4,7 @@
 #include "Interp.h"
 #include "Macros.h"
 #include "Timer.h"
+#include "Vectors.h"
 
 struct BulletEx
 {
@@ -29,7 +30,7 @@ struct BulletExState02_Accel
     Timer timer;
     float accelNorm;
     float accelAngle;
-    D3DXVECTOR3 accelVector;
+    Float3 accelVector;
     int duration;
     char unused[8];
 };
@@ -108,7 +109,7 @@ struct BulletExState25_Move
     Timer timer;
     float finalSpeed;
     char unused[4];
-    D3DXVECTOR3 finalPosition;
+    Float3 finalPosition;
     int duration;
     int interpMode;
     char unused2[4];
@@ -119,7 +120,7 @@ struct BulletExState27_VelAdditional
 {
     Timer timer;
     uint32_t unused;
-    D3DXVECTOR3 vec3;
+    Float3 vec3;
     int duration;
     int idk[3];
 };
@@ -131,11 +132,11 @@ public:
     uint32_t flags;
     uint32_t remainingInvulnerabilityFrames;
     AnmVm vm;
-    D3DXVECTOR3 pos;
-    D3DXVECTOR3 velocity;
+    Float3 pos;
+    Float3 velocity;
     float speed;
     float angle;
-    D3DXVECTOR2 hitbox;
+    Float2 hitbox;
     Timer timer0;
     Timer timer1;
     int ex_21a;
@@ -166,7 +167,7 @@ public:
     BulletExState25_Move exMove;
     BulletExState27_VelAdditional exVelAdditional;
     uint32_t idk5;
-    Interp<D3DXVECTOR3> exMove_i;
+    Interp<Float3> exMove_i;
     short type;
     short color;
 

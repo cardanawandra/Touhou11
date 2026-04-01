@@ -24,7 +24,7 @@ AnmVm::~AnmVm()
 // 0x401fd0
 void AnmVm::initialize(AnmVm* This)
 {
-    D3DXVECTOR3 entityPos = This->m_entityPos;
+    Float3 entityPos = This->m_entityPos;
     int layer = This->m_layer;
     This->m_scale.x = 1.0;
     This->m_scale.y = 1.0;
@@ -363,7 +363,7 @@ void AnmVm::writeSpriteCharacters(
     RenderVertex144* topLeft
 )
 {
-    D3DXVECTOR3 effectivePos = This->m_entityPos + This->m_pos + This->m_offsetPos;
+    Float3 effectivePos = This->m_entityPos + This->m_pos + This->m_offsetPos;
     float width = This->m_spriteSize.x * This->m_scale.x;
     float height = This->m_spriteSize.y * This->m_scale.y;
 
@@ -443,7 +443,7 @@ void AnmVm::writeSpriteCharactersWithoutRot(
     RenderVertex144* topLeft
 )
 {
-    D3DXVECTOR3 effectivePos = This->m_entityPos + This->m_pos + This->m_offsetPos;
+    Float3 effectivePos = This->m_entityPos + This->m_pos + This->m_offsetPos;
     float width = This->m_spriteSize.x * This->m_scale.x;
     float height = This->m_spriteSize.y * This->m_scale.y;
 
@@ -513,7 +513,7 @@ void AnmVm::applyZRotationToQuadCorners(
     RenderVertex144* topRight
 )
 {
-    D3DXVECTOR3 effectivePos = This->m_entityPos + This->m_pos + This->m_offsetPos;
+    Float3 effectivePos = This->m_entityPos + This->m_pos + This->m_offsetPos;
     float width = This->m_spriteSize.x * This->m_scale.x;
     float height = This->m_spriteSize.y * This->m_scale.y;
 
@@ -598,7 +598,7 @@ int AnmVm::projectQuadCornersThroughCameraViewport(AnmVm* This)
     float cosZ = cosf(rotZ);
     float sinZ = sinf(rotZ);
 
-    D3DXVECTOR3 localOrigin{};
+    Float3 localOrigin{};
     D3DXMATRIX worldMatrix;
     D3DXMatrixIdentity(&worldMatrix);
 
@@ -607,7 +607,7 @@ int AnmVm::projectQuadCornersThroughCameraViewport(AnmVm* This)
     worldMatrix._42 = This->m_entityPos.y + This->m_pos.y + This->m_offsetPos.y;
     worldMatrix._43 = This->m_entityPos.z + This->m_pos.z + This->m_offsetPos.z;
 
-    D3DXVECTOR3 screenPos;
+    Float3 screenPos;
     D3DXVec3Project(&screenPos, &localOrigin, &g_supervisor.currentCam->viewport,
         &g_supervisor.currentCam->projectionMatrix,
         &g_supervisor.currentCam->viewMatrix, &worldMatrix);
@@ -615,7 +615,7 @@ int AnmVm::projectQuadCornersThroughCameraViewport(AnmVm* This)
     if (screenPos.z < 0.0f || screenPos.z > 1.0f)
         return -1;
 
-    D3DXVECTOR3 callibratedScreenPos;
+    Float3 callibratedScreenPos;
     D3DXVec3Project(
         &callibratedScreenPos,
         &g_supervisor.currentCam->callibration,
@@ -624,7 +624,7 @@ int AnmVm::projectQuadCornersThroughCameraViewport(AnmVm* This)
         &g_supervisor.currentCam->viewMatrix, &worldMatrix
     );
 
-    D3DXVECTOR3 diff;
+    Float3 diff;
     diff.x = callibratedScreenPos.x - screenPos.x;
     diff.y = callibratedScreenPos.y - screenPos.y;
     diff.z = callibratedScreenPos.z - screenPos.z;

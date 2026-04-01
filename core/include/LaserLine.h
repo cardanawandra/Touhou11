@@ -15,7 +15,7 @@ public:
     float float_0x450;
     float float_0x454;
     int int_0x458;
-    D3DXVECTOR2 maybePlayerPos;
+    Float2 maybePlayerPos;
     short laserAnmScriptRelated;
     short scriptNumber;
     int idk[110];

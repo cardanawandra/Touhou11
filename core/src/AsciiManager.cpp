@@ -1,6 +1,6 @@
 #include "AsciiManager.h"
 
-void AsciiManager::loadAsciiStrings(AsciiManager* This, const char* string, D3DXVECTOR3* position)
+void AsciiManager::loadAsciiStrings(AsciiManager* This, const char* string, Float3* position)
 {
     if (This->m_numStrings >= STRING_ARRAY_SIZE)
         return;
@@ -19,7 +19,7 @@ void AsciiManager::loadAsciiStrings(AsciiManager* This, const char* string, D3DX
 
 void AsciiManager::spawnUnknownEffect(float x, float y)
 {
-    D3DXVECTOR3 spawnPosition;
+    Float3 spawnPosition;
     spawnPosition.x = x;
     spawnPosition.y = y;
     spawnPosition.z = 0.0;
@@ -32,7 +32,7 @@ void AsciiManager::spawnUnknownEffect(float x, float y)
     }
 }
 
-void AsciiManager::spawnAnm(AnmLoaded* anmLoaded, AnmId* outAnmId, int scriptNumber, int vmLayer, D3DXVECTOR3* spawnPosition)
+void AsciiManager::spawnAnm(AnmLoaded* anmLoaded, AnmId* outAnmId, int scriptNumber, int vmLayer, Float3* spawnPosition)
 {
     AnmVm* vm;
     g_supervisor.enterCriticalSection(9);

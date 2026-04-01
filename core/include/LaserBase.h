@@ -3,6 +3,7 @@
 #include "LaserSegment.h"
 #include "Timer.h"
 #include "Macros.h"
+#include "Vectors.h"
 
 struct LaserBaseVftable
 {
@@ -52,8 +53,8 @@ public:
     uint32_t u1_0x10;                 // 0x10
     Timer timer_0x14;                 // 0x14
     Timer timer_0x28;                 // 0x28
-    D3DXVECTOR3 laserBasePosition;    // 0x3c
-    D3DXVECTOR3 vec_0x48;             // 0x48
+    Float3 laserBasePosition;    // 0x3c
+    Float3 vec_0x48;             // 0x48
     float laserAngle;                 // 0x54
     float totalLength;                // 0x58
     float someFloat_0x5c;             // 0x5c

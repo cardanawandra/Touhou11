@@ -42,14 +42,14 @@ public:
     AnmVmList m_nodeAsFamilyMember;                          // <0x10>
     AnmVm* m_nextInLayerList;                                // <0x1c>
     int m_layer;                                             // <0x20>
-    D3DXVECTOR3 m_rotation;                                  // <0x24>
-    D3DXVECTOR3 m_angularVelocity;                           // <0x30>
-    D3DXVECTOR2 m_scale;                                     // <0x3c>
-    D3DXVECTOR2 m_scaleGrowth;                               // <0x44>
-    D3DXVECTOR2 m_spriteSize;                                // <0x4c>
-    D3DXVECTOR2 m_uvScrollPos;                               // <0x54>
+    Float3 m_rotation;                                       // <0x24>
+    Float3 m_angularVelocity;                                // <0x30>
+    Float2 m_scale;                                          // <0x3c>
+    Float2 m_scaleGrowth;                                    // <0x44>
+    Float2 m_spriteSize;                                     // <0x4c>
+    Float2 m_uvScrollPos;                                    // <0x54>
     Timer m_timeInScript;                                    // <0x5c>
-    D3DXVECTOR2 m_spriteUvQuad[4];                           // <0x70>
+    Float2 m_spriteUvQuad[4];                                // <0x70>
     Interp<Float3> m_posInterp;                              // <0x90>
     Interp<Int3> m_rgbInterp;                                // <0xdc>
     Interp<int> m_alphaInterp;                               // <0x128>
@@ -59,7 +59,7 @@ public:
     Interp<int> m_alpha2Interp;                              // <0x228>
     Interp<float> m_uVelInterp;                              // <0x254>
     Interp<float> m_vVelInterp;                              // <0x280>
-    D3DXVECTOR2 m_uvScrollVel;                               // <0x2ac>
+    Float2 m_uvScrollVel;                               // <0x2ac>
     D3DXMATRIX m_baseScaleMatrix;                            // <0x2b4>
     D3DXMATRIX m_localTransformMatrix;                       // <0x2f4>
     D3DXMATRIX m_textureMatrix;                              // <0x334>
@@ -82,9 +82,9 @@ public:
     float m_floatVars[4];                                    // <0x3c4>
     int m_intVar8;                                           // <0x3d4>
     int m_intVar9;                                           // <0x3d8>
-    D3DXVECTOR3 m_pos;                                       // <0x3dc>
-    D3DXVECTOR3 m_entityPos;                                 // <0x3e8>
-    D3DXVECTOR3 m_offsetPos;                                 // <0x3f4>
+    Float3 m_pos;                                            // <0x3dc>
+    Float3 m_entityPos;                                      // <0x3e8>
+    Float3 m_offsetPos;                                      // <0x3f4>
     SpecialRenderData* m_specialRenderData;                  // <0x400>
     uint32_t m_flagsLow;                                     // <0x404>
     uint32_t m_flagsHigh;                                    // <0x408>

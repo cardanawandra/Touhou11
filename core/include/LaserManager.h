@@ -19,7 +19,7 @@ public:
     LaserBase* pLaserData;
     int numLasersMaybe;
     int someLimit;
-    D3DXVECTOR3 playerPos;
+    Float3 playerPos;
     int idk[3];
     AnmLoaded* laserAnm;
     int idk2;

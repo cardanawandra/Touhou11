@@ -211,7 +211,7 @@ public:
 
     static void blitTextures(AnmManager* This);
 
-    static void spawnVmAtPosition(AnmLoaded* anmLoaded, AnmId* anmId, int scriptNumber, int layer, D3DXVECTOR3* spawnLocation);
+    static void spawnVmAtPosition(AnmLoaded* anmLoaded, AnmId* anmId, int scriptNumber, int layer, Float3* spawnLocation);
 
     static ChainCallbackResult renderLayer(AnmManager* This, int layer);
 

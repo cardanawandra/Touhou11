@@ -585,10 +585,10 @@ int AnmManager::updateWorldMatrixAndProjectQuadCorners(AnmManager* This, AnmVm* 
     D3DXMATRIX* baseSpriteScaleMatrix;
     D3DXMATRIX* localTransformMatrix;
     D3DXMATRIX* lpMatrixCopy;
-    D3DXVECTOR3 vecBottomLeft;
-    D3DXVECTOR3 vecBottomRight;
-    D3DXVECTOR3 vecTopLeft;
-    D3DXVECTOR3 vecTopRight;
+    Float3 vecBottomLeft;
+    Float3 vecBottomRight;
+    Float3 vecTopLeft;
+    Float3 vecTopRight;
     D3DXMATRIX worldMatrix;
     D3DXMATRIX rotationMatrix;
     float rotX;
@@ -707,7 +707,7 @@ int AnmManager::updateWorldMatrixAndProjectQuadCorners(AnmManager* This, AnmVm* 
     vecTopRight.z = 0.0;
 
     // Project quad corners to screen space
-    D3DXVECTOR3 bottomLeftOut, bottomRightOut, topLeftOut, topRightOut;
+    Float3 bottomLeftOut, bottomRightOut, topLeftOut, topRightOut;
     D3DXVec3Project(
         &bottomLeftOut,
         &vecBottomLeft,
@@ -1284,7 +1284,7 @@ void AnmManager::putInVmList(AnmVm* vm, AnmId* anmId)
 }
 
 // 0x455b10
-void AnmManager::spawnVmAtPosition(AnmLoaded* anmLoaded,AnmId* anmId, int scriptNumber, int layer, D3DXVECTOR3* spawnLocation)
+void AnmManager::spawnVmAtPosition(AnmLoaded* anmLoaded,AnmId* anmId, int scriptNumber, int layer, Float3* spawnLocation)
 {
     AnmVm* vm;
     g_supervisor.enterCriticalSection(9);
@@ -1379,7 +1379,7 @@ void AnmManager::transformAndDraw(AnmManager* This, AnmVm* vm)
     int g = (baseColor >> 8) & 0xFF;
     int b = baseColor & 0xFF;
 
-    D3DXVECTOR3* srcPos = &This->m_squareVertices->position;
+    Float3* srcPos = &This->m_squareVertices->position;
 
     for (int i = 0; i < 4; i++)
     {

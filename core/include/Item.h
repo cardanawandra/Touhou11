@@ -3,12 +3,13 @@
 #include "AnmManager.h"
 #include "Timer.h"
 #include "Macros.h"
+#include "Vectors.h"
 
 struct Item
 {
 	AnmVm vm;
-	D3DXVECTOR3 vec3;
-	D3DXVECTOR2 vec2;
+	Float3 vec3;
+	Float2 vec2;
 	int someInt_0x448;
 	int someInt_0x44c;
 	Timer timer;

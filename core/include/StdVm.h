@@ -6,7 +6,7 @@
 struct Entity
 {
     float idk;
-    D3DXVECTOR3 position;
+    Float3 position;
     float width;
     float height;
     float depth;
@@ -26,5 +26,5 @@ public:
      * @param  cullDistanceSq Stack[0x4]:4
      * @param  entity         ECX
      */
-    static BOOL checkEntityVisibility(Camera* camera, D3DXVECTOR3* vec, float cullDistanceSq, Entity* entity);
+    static BOOL checkEntityVisibility(Camera* camera, Float3* vec, float cullDistanceSq, Entity* entity);
 };
