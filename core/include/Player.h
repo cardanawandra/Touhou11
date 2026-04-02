@@ -4,6 +4,7 @@
 #include "Chireiden.h"
 #include "Chain.h"
 #include "Macros.h"
+#include "ShotFile.h"
 #include "Shottypes.h"
 #include "Vectors.h"
 
@@ -100,6 +101,7 @@ struct PlayerDamageSource
 };
 ASSERT_SIZE(PlayerDamageSource, 0x74);
 
+class EnemyManager;
 class Player
 {
 public:
@@ -132,7 +134,7 @@ public:
     int reimuAGappingState;                                // <0x920>
     int reimuAFramesInGappingState;                        // <0x924>
     int state;                                             // <0x928>
-    uint32_t* shotFile;                                    // <0x92c>
+    ShotFile* shotFile;                                    // <0x92c>
     Timer timer0;                                          // <0x930>
     Timer timer1;                                          // <0x944>
     Timer timer2;                                          // <0x958>
@@ -199,7 +201,7 @@ public:
     static void shoot(Player* This, int currentTime);
 
     // 0x434380
-    static int shootingTick(Player* This, /*EnemyManager* enemyManager,*/ int someNumber);
+    static int shootingTick(Player* This, EnemyManager* enemyManager, int someNumber);
 
     // 0x433f90
     static int shootOneBullet(Player* This, Float3* position, int currentTime, Shooter* shooter);

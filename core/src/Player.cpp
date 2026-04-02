@@ -425,22 +425,19 @@ void Player::setIframes(int currentTime)
 }
 
 int Player::useBomb()
-{
-    uint32_t uVar1;
-    
+{    
     if (g_bomb->isUsingBomb != 0)
         return -1;
 
     g_bomb->isUsingBomb = 1;
     g_bomb->timer0.reset();
 
-    if (((g_spellcard->flags & 1) == 0) || ((g_spellcard->timer).current < 0x3c)) {
-    This->someIndicator = 0;
-    }
-    else {
-    This->someIndicator = 1;
-    }
-    SoundManager::playSoundWithPan((g_player->position).x,0x26);
+    if (((g_spellcard->flags & 1) == 0) || (g_spellcard->timer.current < 0x3c))
+        This->someIndicator = 0;
+    else
+        This->someIndicator = 1;
+
+    SoundManager::playSoundWithPan(g_player->position.x, 0x26);
 
     switch (g_globals.character)
     {
@@ -475,5 +472,222 @@ int Player::useBomb()
         break;
     }
     return 0;
+}
+
+int Player::initialize(Player* This)
+{
+    float fVar1;
+    float fVar2;
+    float fVar3;
+    ShotFile *pSVar4;
+    AnmLoaded *anmLoaded;
+    int res;
+    ChainElem *chainElem;
+    float itemAttractBox;
+    float itemAttractBoxFocused;
+    float hurtbox;
+    uint isInitialized;
+    
+    const char* playerAnm = g_globals.character == 0 ? "pl00.anm" : "pl01.anm";
+    anmLoaded = g_anmManager->preloadAnm(7,player);
+
+    This->playerAnm = anmLoaded;
+    if (anmLoaded)
+    {
+        if (!g_shotFile)
+        {
+            res = loadShotFile(This,(&g_shotFileArray)[g_globals.subshot + g_globals.character * 3]);
+            if (res != 0)
+                goto Error;
+        }
+        else
+        {
+            This->shotFile = g_shotFile;
+            g_shotFile = (uint32_t *)0x0;
+        }
+
+        chainElem = (ChainElem *)operator_new(0x24);
+        if (chainElem == (ChainElem *)0x0) {
+        chainElem = (ChainElem *)0x0;
+        }
+        else {
+        chainElem->nextNode = (ChainElem *)((uint)chainElem->nextNode & 0xfffffffe);
+        (chainElem->jobRunDrawChainCallbackOrTrackerPrev).trackerPrev = (ChainElem *)0x0;
+        chainElem->registerChainCallback = (ChainCallback *)0x0;
+        chainElem->runCalcChainCallback = (ChainCallback *)0x0;
+        (chainElem->trackerJobNodeOrjobPriority).jobPriority = 0;
+        (chainElem->embeddedTracker).trackerJobNode = chainElem;
+        (chainElem->embeddedTracker).trackerNextNode = (ChainElem *)0x0;
+        (chainElem->embeddedTracker).trackerPrevNode = (ChainElem *)0x0;
+        }
+        (chainElem->jobRunDrawChainCallbackOrTrackerPrev).trackerPrev = (ChainElem *)onTickStub;
+        chainElem->registerChainCallback = (ChainCallback *)0x0;
+        chainElem->runCalcChainCallback = (ChainCallback *)0x0;
+        chainElem->args = This;
+        chainElem->nextNode = (ChainElem *)((uint)chainElem->nextNode & 0xfffffffd | 1);
+        Chain::registerCalcChain(chainElem,0x10);
+        This->onDraw = chainElem;
+        chainElem = (ChainElem *)operator_new(0x24);
+        if (chainElem == (ChainElem *)0x0) {
+        chainElem = (ChainElem *)0x0;
+        }
+        else {
+        chainElem->nextNode = (ChainElem *)((uint)chainElem->nextNode & 0xfffffffe);
+        (chainElem->jobRunDrawChainCallbackOrTrackerPrev).trackerPrev = (ChainElem *)0x0;
+        chainElem->registerChainCallback = (ChainCallback *)0x0;
+        chainElem->runCalcChainCallback = (ChainCallback *)0x0;
+        (chainElem->trackerJobNodeOrjobPriority).jobPriority = 0;
+        (chainElem->embeddedTracker).trackerJobNode = chainElem;
+        (chainElem->embeddedTracker).trackerNextNode = (ChainElem *)0x0;
+        (chainElem->embeddedTracker).trackerPrevNode = (ChainElem *)0x0;
+        }
+        (chainElem->jobRunDrawChainCallbackOrTrackerPrev).trackerPrev = (ChainElem *)onDraw16Stub;
+        chainElem->registerChainCallback = (ChainCallback *)0x0;
+        chainElem->runCalcChainCallback = (ChainCallback *)0x0;
+        chainElem->args = This;
+
+
+        chainElem->nextNode = (ChainElem *)((uint)chainElem->nextNode & 0xfffffffd | 1);
+
+        g_chain->registerDrawChain(chainElem,0x16);
+        anmLoaded = This->playerAnm;
+        This->chainElem2 = chainElem;
+        This->vm0->initialize(&This->vm0);
+        This->vm0.fontDimensions[1] = 16;
+        This->vm0.fontDimensions[0] = 16;
+        This->vm0->loadIntoAnmVm(&This->vm0, anmLoaded, 0);
+        pSVar4 = This->shotFile;
+        (This->position).x = 0.0;
+        (This->position).y = 400.0;
+        (This->posSubpixel).x = 0;
+        (This->posSubpixel).y = 0xc800;
+        res = roundFloat(*(float *)&pSVar4->field_0x10 * 128.0);
+        This->normalSpeedSubpixel = res;
+        res = roundFloat((float)((float10)*(float *)&pSVar4->field_0x14 * extraout_ST0));
+        This->focusSpeedSubpixel = res;
+        res = roundFloat((float)((float10)*(float *)&pSVar4->field_0x18 * extraout_ST0_00));
+        This->normalSpeedSubpixelOverSqrt2 = res;
+        res = roundFloat((float)(extraout_ST0_01 * (float10)*(float *)&pSVar4->field_0x1c));
+        This->focusSpeedSubpixelOverSqrt2 = res;
+        g_globals.maxPower = *(int *)&pSVar4->field_0x24 * pSVar4->someInt;
+        g_globals.powerPerLevel = *(int *)&This->shotFile->field_0x24;
+        isInitialized = (This->timer0).isInitialized;
+        if ((isInitialized & 1) == 0) {
+        (This->timer0).currentF = (float)extraout_ST0_02;
+        (This->timer0).current = 0;
+        (This->timer0).previous = -999999;
+        (This->timer0).gameSpeed = &g_gameSpeed;
+        (This->timer0).isInitialized = isInitialized | 1;
+        }
+        (This->timer0).previous = -2;
+        (This->timer0).currentF = -1.0;
+        (This->timer0).current = -1;
+                        /* these are float[2]s, where 0 = reimu, 1 = marisa */
+        This->shotFile->hurtboxSize = g_playerHurtboxes[g_globals.character];
+        This->shotFile->itemAttractBoxSize = g_playerItemAttractBoxes[g_globals.character];
+        This->shotFile->float_0x8 = g_playerRelated_5_or_7[g_globals.character];
+        hurtbox = This->shotFile->hurtboxSize * 0.5;
+        (This->hurtboxHalfSize).y = hurtbox;
+        (This->hurtboxHalfSize).x = hurtbox;
+        (This->hurtboxHalfSize).z = 5.0;
+        itemAttractBox = g_playerItemAttractBoxes[g_globals.character];
+        (This->item_attract_box_unfocused_halfsize).y = itemAttractBox * 0.5;
+        (This->item_attract_box_unfocused_halfsize).x = itemAttractBox * 0.5;
+        (This->item_attract_box_unfocused_halfsize).z = 5.0;
+        itemAttractBoxFocused = g_playerItemAttractBoxesFocused[g_globals.character];
+        (This->item_attract_box_focused_halfsize).y = itemAttractBoxFocused * 0.5;
+        (This->item_attract_box_focused_halfsize).x = itemAttractBoxFocused * 0.5;
+        (This->item_attract_box_focused_halfsize).z = 5.0;
+        hurtbox = (This->position).y;
+        fVar1 = (This->hurtboxHalfSize).y;
+        fVar2 = (This->position).z;
+        fVar3 = (This->hurtboxHalfSize).z;
+        (This->hurtBox).minPos.x = (This->position).x - (This->hurtboxHalfSize).x;
+        (This->hurtBox).minPos.y = hurtbox - fVar1;
+        (This->hurtBox).minPos.z = fVar2 - fVar3;
+        hurtbox = (This->hurtboxHalfSize).y;
+        fVar1 = (This->position).y;
+        fVar2 = (This->hurtboxHalfSize).z;
+        fVar3 = (This->position).z;
+        (This->hurtBox).maxPos.x = (This->hurtboxHalfSize).x + (This->position).x;
+        (This->hurtBox).maxPos.y = hurtbox + fVar1;
+        (This->hurtBox).maxPos.z = fVar2 + fVar3;
+        hurtbox = (This->position).y;
+        fVar1 = (This->item_attract_box_unfocused_halfsize).y;
+        fVar2 = (This->position).z;
+        fVar3 = (This->item_attract_box_unfocused_halfsize).z;
+        (This->itemCollectBox).minPos.x =
+            (This->position).x - (This->item_attract_box_unfocused_halfsize).x;
+        (This->itemCollectBox).minPos.y = hurtbox - fVar1;
+        (This->itemCollectBox).minPos.z = fVar2 - fVar3;
+        hurtbox = (This->item_attract_box_unfocused_halfsize).y;
+        fVar1 = (This->position).y;
+        fVar2 = (This->item_attract_box_unfocused_halfsize).z;
+        fVar3 = (This->position).z;
+        (This->itemCollectBox).maxPos.x =
+            (This->item_attract_box_unfocused_halfsize).x + (This->position).x;
+        (This->itemCollectBox).maxPos.y = hurtbox + fVar1;
+        (This->itemCollectBox).maxPos.z = fVar2 + fVar3;
+        hurtbox = (This->position).y;
+        fVar1 = (This->item_attract_box_focused_halfsize).y;
+        fVar2 = (This->position).z;
+        fVar3 = (This->item_attract_box_focused_halfsize).z;
+        (This->itemAttractBoxFocused).minPos.x =
+            (This->position).x - (This->item_attract_box_focused_halfsize).x;
+        (This->itemAttractBoxFocused).minPos.y = hurtbox - fVar1;
+        (This->itemAttractBoxFocused).minPos.z = fVar2 - fVar3;
+        hurtbox = (This->item_attract_box_focused_halfsize).y;
+        fVar1 = (This->position).y;
+        fVar2 = (This->item_attract_box_focused_halfsize).z;
+        fVar3 = (This->position).z;
+        (This->itemAttractBoxFocused).maxPos.x =
+            (This->item_attract_box_focused_halfsize).x + (This->position).x;
+        (This->itemAttractBoxFocused).maxPos.y = hurtbox + fVar1;
+        (This->itemAttractBoxFocused).maxPos.z = fVar2 + fVar3;
+        hurtbox = (This->position).y;
+        fVar1 = (This->item_attract_box_focused_halfsize).y;
+        fVar2 = (This->position).z;
+        fVar3 = (This->item_attract_box_focused_halfsize).z;
+        (This->itemAttractBoxUnfocused).minPos.x =
+            (This->position).x - (This->item_attract_box_focused_halfsize).x;
+        (This->itemAttractBoxUnfocused).minPos.y = hurtbox - fVar1;
+        (This->itemAttractBoxUnfocused).minPos.z = fVar2 - fVar3;
+        hurtbox = (This->item_attract_box_focused_halfsize).y;
+        fVar1 = (This->position).y;
+        fVar2 = (This->item_attract_box_focused_halfsize).z;
+        fVar3 = (This->position).z;
+        (This->itemAttractBoxUnfocused).maxPos.x =
+            (This->item_attract_box_focused_halfsize).x + (This->position).x;
+        (This->itemAttractBoxUnfocused).maxPos.y = hurtbox + fVar1;
+        (This->itemAttractBoxUnfocused).maxPos.z = fVar2 + fVar3;
+        isInitialized = (This->timer1).isInitialized;
+        if ((isInitialized & 1) == 0) {
+        (This->timer1).currentF = (float)extraout_ST0_02;
+        (This->timer1).current = 0;
+        (This->timer1).previous = -999999;
+        (This->timer1).gameSpeed = &g_gameSpeed;
+        (This->timer1).isInitialized = isInitialized | 1;
+        }
+        (This->timer1).currentF = (float)extraout_ST0_02;
+        (This->timer1).current = 0;
+        (This->timer1).previous = -1;
+        isInitialized = (This->timerIframes).isInitialized;
+        if ((isInitialized & 1) == 0) {
+        (This->timerIframes).currentF = (float)extraout_ST0_02;
+        (This->timerIframes).current = 0;
+        (This->timerIframes).previous = -999999;
+        (This->timerIframes).gameSpeed = &g_gameSpeed;
+        (This->timerIframes).isInitialized = isInitialized | 1;
+        }
+        (This->timerIframes).current = 0x78;
+        (This->timerIframes).currentF = 120.0;
+        (This->timerIframes).previous = 0x77;
+        This->reimu_c_related_probably_0x7c90 = 0;
+        This->percentMovedByOptions = 0x1e;
+        return 0;
+    }
+    :
+    puts("自機データが見つかりません。データが壊れています\n");
+    return -1;
 }
 

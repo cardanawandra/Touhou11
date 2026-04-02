@@ -31,6 +31,7 @@
 #include <cmath>
 #include <iostream>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 // Utilities

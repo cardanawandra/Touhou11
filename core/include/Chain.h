@@ -1,6 +1,7 @@
 #pragma once
-#include <cstdint>
+#include "Chireiden.h"
 #include "Macros.h"
+#include <cstdint>
 
 enum ChainCallbackResult
 {
@@ -21,26 +22,39 @@ typedef ChainCallbackResult(__fastcall* ChainCallback)(void*);
 
 struct ChainElem
 {
+    ChainElem()
+    {
+        nextNode = (ChainElem*) ((uintptr_t)nextNode & ~1);
+        embeddedTracker.trackerJobNode = this;
+    }
+
+    ChainElem(ChainCallback callback)
+    {
+        nextNode = (ChainElem*) ((uintptr_t)nextNode & ~1);
+        jobRunDrawChainCallback = callback;
+        embeddedTracker.trackerJobNode = this;
+    }
+
     union {
-        ChainElem* trackerJobNode;             // <0x0> Tracker: Points to job node
-        int jobPriority;                       // <0x0> Job: Priority value
+        ChainElem* trackerJobNode{};             // <0x0> Tracker: Points to job node
+        int jobPriority;                         // <0x0> Job: Priority value
     };
 
     // Bit 0 of indicates whether the node is heap-allocated
     // Bit 1 indicates whether the node is a job node
-    ChainElem* nextNode;                       // <0x4> Job/Tracker: Next node in list
+    ChainElem* nextNode{};                       // <0x4> Job/Tracker: Next node in list
     union {
-        ChainCallback jobRunDrawChainCallback; // <0x8> Job: Callback
-        ChainElem* trackerPrevNode;            // <0x8> Tracker: Previous node
+        ChainCallback jobRunDrawChainCallback{}; // <0x8> Job: Callback
+        ChainElem* trackerPrevNode;              // <0x8> Tracker: Previous node
     };
-    ChainCallback registerChainCallback;       // <0xc> Job: Registration callback
-    ChainCallback runCalcChainCallback;        // <0x10> Job: Calculation callback
+    ChainCallback registerChainCallback{};       // <0xc> Job: Registration callback
+    ChainCallback runCalcChainCallback{};        // <0x10> Job: Calculation callback
     struct {
-        ChainElem* trackerJobNode;             // <0x14> Tracker: Points to this job node
-        ChainElem* trackerNextNode;            // <0x18> Tracker: Next tracker node
-        ChainElem* trackerPrevNode;            // <0x1c> Tracker: Previous tracker node
+        ChainElem* trackerJobNode{};             // <0x14> Tracker: Points to this job node
+        ChainElem* trackerNextNode{};            // <0x18> Tracker: Next tracker node
+        ChainElem* trackerPrevNode{};            // <0x1c> Tracker: Previous tracker node
     } embeddedTracker;
-    void* args;                                // <0x20> Job: Callback arguments
+    void* args{};                                // <0x20> Job: Callback arguments
 };
 ASSERT_SIZE(ChainElem, 0x24);
 
