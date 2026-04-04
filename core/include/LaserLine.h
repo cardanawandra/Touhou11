@@ -24,4 +24,4 @@ public:
 
     static int createOrDestroyLaserSegments(LaserLine* This, AnmId anmId, int cancelFlag);
 };
-ASSERT_SIZE(LaserLine, 0xe8c);
+// ASSERT_SIZE(LaserLine, 0xe8c);

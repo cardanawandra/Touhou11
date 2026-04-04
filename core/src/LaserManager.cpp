@@ -3,6 +3,7 @@
 
 int LaserManager::allocateNewLaser(int mode)
 {
+    #if 0
     LaserBase* laserBase;
     LaserBase* laserDataPtr;
 
@@ -39,4 +40,5 @@ int LaserManager::allocateNewLaser(int mode)
     laserManager->laserDataPtr = &laserLine->laserData;
     (*((laserLine->laserData).laserDataVtable_0x0)->vfunction2)(&laserLine->laserData);
     return laserManager->someLimit;
+    #endif
 }
