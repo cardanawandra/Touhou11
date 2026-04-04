@@ -1,14 +1,16 @@
 #pragma once
 #include "Chireiden.h"
 
-struct Float3
+struct Float3 : public D3DXVECTOR3
 {
-    float x{ 0.0f };
-    float y{ 0.0f };
-    float z{ 0.0f };
-
     Float3() = default;
-    Float3(float x, float y, float z) : x(x), y(y), z(z) {}
+
+    Float3(float x, float y, float z)
+    {
+        this->x = x;
+        this->y = y;
+        this->z = z;
+    }
 
     Float3 operator+(const Float3& rhs) const { return { x + rhs.x, y + rhs.y, z + rhs.z }; }
     Float3 operator-(const Float3& rhs) const { return { x - rhs.x, y - rhs.y, z - rhs.z }; }
@@ -43,19 +45,17 @@ struct Float3
         float len = length();
         return (len > 0.0f) ? (*this / len) : Float3(0, 0, 0);
     }
-
-    // Direct3D Interop
-    operator D3DXVECTOR3() const { return { x, y, z }; }
-    Float3(const D3DXVECTOR3& v) : x(v.x), y(v.y), z(v.z) {}
 };
 
-struct Float2
+struct Float2 : public D3DXVECTOR2
 {
-    float x{ 0.0f };
-    float y{ 0.0f };
-
     Float2() = default;
-    Float2(float x, float y) : x(x), y(y) {}
+
+    Float2(float x, float y)
+    {
+        this->x = x;
+        this->y = y;
+    }
 
     Float2 operator+(const Float2& rhs) const { return { x + rhs.x, y + rhs.y }; }
     Float2 operator-(const Float2& rhs) const { return { x - rhs.x, y - rhs.y }; }
@@ -86,10 +86,6 @@ struct Float2
         float len = length();
         return (len > 0.0f) ? (*this / len) : Float2(0, 0);
     }
-
-    // Direct3D Interop
-    operator D3DXVECTOR2() const { return { x, y }; }
-    Float2(const D3DXVECTOR2& v) : x(v.x), y(v.y) {}
 };
 
 struct Int3 
