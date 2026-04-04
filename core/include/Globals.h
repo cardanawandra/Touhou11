@@ -76,3 +76,9 @@ float normalizeAngle(float inputAngleRadians);
 
 // 0x459aa0
 void decomposeAngle(Float3* outVec, float angle, float scale);
+
+extern const char* g_shotFiles[];
+extern float g_playerHurtboxes[2];
+extern float g_playerItemAttractBoxes[2];
+extern float g_playerItemAttractBoxesFocused[2];
+extern float g_playerRelated_5_or_7[2];

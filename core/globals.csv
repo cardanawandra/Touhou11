@@ -36,3 +36,7 @@ ItemManager*,         g_itemManager,          0x4a8e90
 char[256],            g_currentEclFilePath,   0x4c9928
 EnemyManager*,        g_enemyManager,         0x4a8d7c
 Bomb*,                g_bomb,                 0x4a8d64
+ShotFile*,            g_shotFile,             0x4c3240
+uint32_t,             g_lockedTexPitch,       0x4a58d0
+void*,                g_lockedTexBits,        0x4a58e0
+D3DFORMAT,            g_lockedTexFormat,      0x4a58c0

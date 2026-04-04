@@ -1,8 +1,18 @@
 #include "Globals.h"
 #include "FileAbstraction.h"
+#include "Supervisor.h"
 
 D3DFORMAT g_d3dFormats[] = { D3DFMT_UNKNOWN, D3DFMT_A8R8G8B8, D3DFMT_A1R5G5B5, D3DFMT_R5G6B5, D3DFMT_R8G8B8, D3DFMT_A4R4G4B4 };
 uint32_t g_bytesPerPixelLookupTable[] = { 4, 4, 2, 2, 3, 2, 0, 1, 2 };
+const char* g_shotFiles[] = {
+    "pl00a.sht", "pl00b.sht", "pl00c.sht",
+    "pl01a.sht", "pl01b.sht", "pl01c.sht"
+};
+
+float g_playerHurtboxes[2] = {2.0f, 3.5f};
+float g_playerItemAttractBoxes[2] = {60.0f, 70.0f};
+float g_playerItemAttractBoxesFocused[2] = {100.0f, 118.0f};
+float g_playerRelated_5_or_7[2] = {5.0, 7.0};
 
 byte* openFile(const char* filename, size_t* outSize, BOOL isExternalResource)
 {
