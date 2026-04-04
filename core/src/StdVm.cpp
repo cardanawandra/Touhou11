@@ -1,13 +1,13 @@
 #include "StdVm.h"
 
-BOOL StdVm::checkEntityVisibility(Camera* camera, D3DXVECTOR3* offset, float cullDistanceSq, Entity* entity)
+BOOL StdVm::checkEntityVisibility(Camera* camera, Float3* offset, float cullDistanceSq, Entity* entity)
 {
     // Calculate the Entity's Center Position in World Space
     // The 'offset' parameter appears to be a translation offset applied to the entity.
-    D3DXVECTOR3 entityWorldPos = entity->position + *offset;
+    Float3 entityWorldPos = entity->position + *offset;
 
     // Calculate vector from Camera Eye to Entity
-    D3DXVECTOR3 viewDiff = entityWorldPos - (camera->offset + camera->eye);
+    Float3 viewDiff = entityWorldPos - (camera->offset + camera->eye);
     float distanceSq = D3DXVec3LengthSq(&viewDiff);
 
     // If the entity is too far away, cull it immediately.

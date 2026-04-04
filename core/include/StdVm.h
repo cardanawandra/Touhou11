@@ -2,6 +2,7 @@
 #include "AnmVm.h"
 #include "Chireiden.h"
 #include "Macros.h"
+#include "Vectors.h"
 
 struct Entity
 {
@@ -22,9 +23,9 @@ public:
      * 0x403950
      * @brief
      * @param  camera         EAX:4
-     * @param  vec            EDX:4
+     * @param  offset         EDX:4
      * @param  cullDistanceSq Stack[0x4]:4
      * @param  entity         ECX
      */
-    static BOOL checkEntityVisibility(Camera* camera, Float3* vec, float cullDistanceSq, Entity* entity);
+    static BOOL checkEntityVisibility(Camera* camera, Float3* offset, float cullDistanceSq, Entity* entity);
 };
