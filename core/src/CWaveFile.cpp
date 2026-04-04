@@ -1,5 +1,6 @@
 #include "CWaveFile.h"
 #include "Globals.h"
+#include "SoundManager.h"
 
 HRESULT CWaveFile::open(CWaveFile* This, ThBgmFormat* thBgmFormat, const char* filepath)
 {
