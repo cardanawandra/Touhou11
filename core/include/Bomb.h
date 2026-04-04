@@ -25,6 +25,12 @@ struct Bomb
     int idk3;
 
     static ChainCallbackResult onTick(Bomb* This);
+    static void startReimuA(Bomb* This);
+    static void startReimuB(Bomb* This);
+    static void startReimuC(Bomb* This);
+    static void startMarisaA(Bomb* This);
+    static void startMarisaB(Bomb* This);
+    static void startMarisaC(Bomb* This);
     static int onTickReimuA(Bomb* This);
     static int onTickReimuB(Bomb* This);
     static int onTickReimuC(Bomb* This);

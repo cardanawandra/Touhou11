@@ -112,3 +112,33 @@ int Bomb::onTickMarisaC(Bomb* This)
 {
     return 0;
 }
+
+void Bomb::startReimuA(Bomb* This)
+{
+
+}
+
+void Bomb::startReimuB(Bomb* This)
+{
+
+}
+
+void Bomb::startReimuC(Bomb* This)
+{
+
+}
+
+void Bomb::startMarisaA(Bomb* This)
+{
+
+}
+
+void Bomb::startMarisaB(Bomb* This)
+{
+
+}
+
+void Bomb::startMarisaC(Bomb* This)
+{
+
+}
