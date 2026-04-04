@@ -5,9 +5,14 @@ struct ShotFile
 {
     int idk0;
     float hurtboxSize;
+    float float_0x8;
     float itemAttractBoxSize;
-    int idk1[4];
-    int someInt;
-    int idk2[145];
+    float speedSubpixel;
+    float focusedSpeedSubpixel;
+    float normalizedSpeedSubpixel;
+    float normalizedFocusedSpeedSubpixel;
+    int maxPowerMultiplier;
+    int powerPerLevel;
+    int idk2[144];
     Shooter* shooters;
 };
