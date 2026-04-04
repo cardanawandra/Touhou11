@@ -106,25 +106,25 @@ class Player
 {
 public:
     uint32_t idk;                                          // <0x0>
-    ChainElem* onTick;                                     // <0x4>
-    ChainElem* onDraw;                                     // <0x8>
-    ChainElem* chainElem2;                                 // <0xc>
+    uint32_t maybeUnused;                                  // <0x4>
+    ChainElem* onTick10;                                   // <0x8>
+    ChainElem* onDraw16;                                   // <0xc>
     AnmLoaded* playerAnm;                                  // <0x10>
     AnmVm vm0;                                             // <0x14>
     AnmVm vm1;                                             // <0x448>
     Float3 position;                                       // <0x87c>
     Int2 posSubpixel;                                      // <0x888>
-    int normalSpeedSubpixel;                               // <0x990>
-    int focusSpeedSubpixel;                                // <0x894>
-    int normalSpeedSubpixelOverSqrt2;                      // <0x898>
-    int focusSpeedSubpixelOverSqrt2;                       // <0x89c>
+    int speedSubpixel;                                     // <0x990>
+    int focusedSpeedSubpixel;                              // <0x894>
+    int normalizedSpeedSubpixel;        // speed/sqrt(2)   // <0x898>
+    int normalizedFocusedSpeedSubpixel; // speed/sqrt(2)   // <0x89c>
     Float3 attemptedDeltaPosSubpixel;                      // <0x8a0>
     Float3 lastNonzeroAttemptedDeltaPosSubpixel;           // <0x8ac>
     Int2 attemptedDeltaPosISubpixel;                       // <0x8b8>
     int idk2;                                              // <0x8c0>
     int idk3;                                              // <0x8c4>
     int idk4;                                              // <0x8c8>
-    BoundingBox3 hurtbox;                                  // <0x8cc>
+    BoundingBox3 hurtBox;                                  // <0x8cc>
     Float3 hurtboxHalfSize;                                // <0x8e4>
     Float3 itemAttractBoxUnfocusedHalfSize;                // <0x8f0>
     Float3 itemAttractBoxFocusedHalfSize;                  // <0x8fc>
@@ -141,10 +141,13 @@ public:
     PlayerBullet playerBullets[255];                       // <0x96c>
     AnmId anmIdFocusedHitbox;                              // <0x7500>
     PlayerOption playerOptions[8];                         // <0x7504>
-    int idk6[30];                                          // <0x7c24>
+    int idk6[27];                                          // <0x7c24>
+    int reimu_c_related_probably_0x7c90;                   // <0x7c90>
+    int idk7;
+    int idk8;                          
     PlayerDamageSource damageSources[33];                  // <0x7c9c>
     int shooterOptions[4];                                 // <0x8b90>
-    int percentageMovedByOptions;                          // <0x8ba0>
+    int percentMovedByOptions;                             // <0x8ba0>
     int reimuB_FramesWithoutInput;                         // <0x8ba4>
     int reimuC_FramesWithout_Z_Or_Shift;                   // <0x8ba8>
     int marisaB_Formation;                                 // <0x8bac>
@@ -168,7 +171,7 @@ public:
     static int initialize(Player* This);
 
     // 0x431c70
-    static int loadShotFile(Player* This, char* filename);
+    static int loadShotFile(Player* This, const char* filename);
 
     // 0x4336a0
     static void optionCallbackReimuA();
@@ -214,5 +217,15 @@ public:
 
     // 0x432a90
     static int useBomb();
+
+    static ChainCallbackResult __fastcall onTick10Stub(void* This)
+    {
+        return ChainCallbackResult::Continue; //onTick(reinterpret_cast<Player*>(This));
+    }
+
+    static ChainCallbackResult __fastcall onDraw16Stub(void* This)
+    {
+        return ChainCallbackResult::Continue; //onTick(reinterpret_cast<Player*>(This));
+    }
 };
 ASSERT_SIZE(Player, 0x8d24);
