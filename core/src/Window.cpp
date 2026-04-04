@@ -1,9 +1,11 @@
-#include "Window.h"
+#include "AnmManager.h"
 #include "DebugGui.h"
+#include "FpsCounter.h"
 #include "Globals.h"
 #include "Supervisor.h"
-#include "AnmManager.h"
+#include "Spellcard.h"
 #include "ThunkGenerator.h"
+#include "Window.h"
 
 LRESULT Window::wndProcCallback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lpParam)
 {
